@@ -1,0 +1,13 @@
+# Directories
+/db
+/incremental_db
+/work
+/output_files
+/simulation
+
+# Files
+/transcript
+/*.qws
+/*.bak
+/vsim.wlf
+/c5_pin_model_dump.txt
