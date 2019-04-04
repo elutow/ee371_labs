@@ -20,7 +20,7 @@ module full_adder_testbench();
 	int i;
 	initial begin
 		// Iterate through every possible combination of the inputs
-		for (i=0; i<2**3, i++) begin
+		for (i=0; i<2**3; i++) begin
 			{a, b, cin} = i; #10;
 		end
 		$stop;
