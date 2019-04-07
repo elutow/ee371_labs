@@ -4,6 +4,13 @@
 // - enter is 1 for 1 clock cycle if a car has entered; otherwise 0
 // - exit is 1 for 1 clock cycle if a car has exited; otherwise 0
 //
+// Preconditions:
+// - No two objects passing through the detector are closer than the distance
+//   between sensors a and b.
+// - Non-cars are shorter than the distance between sensors a and b.
+// - When a car enters the detector, its displacement vs. time must be
+//   monotonic.
+//
 // Modular dependencies: N/A
 
 module car_detector(clk, reset, a, b, enter, exit);
@@ -16,7 +23,7 @@ module car_detector(clk, reset, a, b, enter, exit);
     always_comb begin
         enter = 0;
         exit = 0;
-        // For invalid sensor inputs, assume the state hasn't changed
+        // By default, assume the state hasn't changed
         ns = ps;
         case (ps)
             S_EMPTY: begin
@@ -25,6 +32,8 @@ module car_detector(clk, reset, a, b, enter, exit);
             end
             S_IN1: begin
                 if (a & b) ns = S_IN2;
+                else if (a & ~b) ns = ps;
+                else ns = S_EMPTY; // Assume pedestrian
             end
             S_IN2: begin
                 if (~a & b) ns = S_IN3;
@@ -37,6 +46,8 @@ module car_detector(clk, reset, a, b, enter, exit);
             end
             S_OUT1: begin
                 if (a & b) ns = S_OUT2;
+                else if (~a & b) ns = ps;
+                else ns = S_EMPTY; // Assume pedestrian
             end
             S_OUT2: begin
                 if (a & ~b) ns = S_OUT3;
