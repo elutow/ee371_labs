@@ -4,7 +4,7 @@
 //
 // Modular dependencies: N/A
 
-module seg7 (bcd, out);
+module seg7(bcd, out);
     input logic [3:0] bcd;
     output logic [6:0] out;
 
@@ -22,6 +22,21 @@ module seg7 (bcd, out);
             4'b1001: out = 7'b0010000; // 9
             default: out = 7'bX;
         endcase
+    end
+endmodule
+
+module seg7_testbench();
+    logic [3:0] bcd;
+    logic [6:0] out;
+
+    seg7 dut(.bcd, .out);
+
+    int i;
+    initial begin
+        #50;
+        for (i=0; i<10; i++) begin
+            bcd = i; #100;
+        end
     end
 endmodule
 
