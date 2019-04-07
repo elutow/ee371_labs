@@ -1,5 +1,6 @@
 // Detects cars entering and exiting the parking lot
-// - a and b are the parking lot photo sensors
+// - a and b are the parking lot photo sensors. 1 if the sensors are
+// 	 obstructed; 0 otherwise
 // - enter is 1 for 1 clock cycle if a car has entered; otherwise 0
 // - exit is 1 for 1 clock cycle if a car has exited; otherwise 0
 
@@ -13,6 +14,7 @@ module car_detector(clk, reset, a, b, enter, exit);
 	always_comb begin
 		enter = 0;
 		exit = 0;
+		// For invalid sensor inputs, assume the state hasn't changed
 		ns = ps;
 		case (ps)
 			S_EMPTY: begin
