@@ -19,22 +19,22 @@ module counter_display(bcd, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5);
     // Text rendering logic
     always_comb begin
         // Default HEX outputs
-        HEX5 = 0;
-        HEX4 = 0;
-        HEX3 = 0;
-        HEX2 = 0;
+        HEX5 = 7'b1111111;
+        HEX4 = HEX5;
+        HEX3 = HEX5;
+        HEX2 = HEX5;
         HEX1 = hex1_buf;
         if (bcd[7:4] == 2 & bcd[3:0] == 5) begin
             // Display FULL
             HEX5 = 7'b0001110;
-            HEX4 = 7'b1100011;
-            HEX3 = 7'b1111001;
+            HEX4 = 7'b1000001;
+            HEX3 = 7'b1000111;
             HEX2 = HEX3;
         end
         else if (bcd == 0) begin
             // Display CLEAR
             HEX5 = 7'b1000110;
-            HEX4 = 7'b1111001;
+            HEX4 = 7'b1000111;
             HEX3 = 7'b0000110;
             HEX2 = 7'b0001000;
             HEX1 = 7'b0101111;
