@@ -102,6 +102,13 @@ module car_detector_testbench();
         inputs <= 2'b10; @(posedge clk); assert(outputs == 0);
         inputs <= 2'b00; @(posedge clk); assert(outputs == 2'b01);
         inputs <= 2'b00; @(posedge clk); assert(outputs == 0);
+        // Check pedestrians
+        inputs <= 2'b01; @(posedge clk); assert(outputs == 0);
+        inputs <= 2'b00; @(posedge clk); assert(outputs == 0);
+        inputs <= 2'b10; @(posedge clk); assert(outputs == 0);
+        inputs <= 2'b00; @(posedge clk); assert(outputs == 0);
+        inputs <= 2'b11; @(posedge clk); assert(outputs == 0);
+        inputs <= 2'b00; @(posedge clk); assert(outputs == 0);
         $stop;
     end
 endmodule
