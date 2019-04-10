@@ -1,13 +1,14 @@
 # Directories
 /db
+/greybox_tmp
 /incremental_db
-/work
 /output_files
 /simulation
+/work
 
 # Files
-/transcript
-/*.qws
 /*.bak
-/vsim.wlf
+/*.qws
 /c5_pin_model_dump.txt
+/transcript
+/vsim.wlf
