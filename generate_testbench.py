@@ -19,7 +19,7 @@ $testbench_tmpl{includes}
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the
 #     testbench module you want to execute.
-vsim -voptargs="+acc" -t 1ps -lib work $testbench_tmpl{entity}_testbench
+vsim -voptargs="+acc" -t 1ps $testbench_tmpl{search_libraries_first} -lib work $testbench_tmpl{entity}_testbench
 
 # Source the wave do file
 #     This should be the file that sets up the signal window for
@@ -93,15 +93,21 @@ def generate_wave_do(entity, signals, output_path):
     ))
     output_path.write_text(content)
 
-def generate_testbench_do(entity, files, output_path):
+def generate_testbench_do(entity, files, libraries_first, output_path):
     """Generates *_testbench.do file for entity"""
     file_entries = tuple(
             map(
                 (lambda x: TESTBENCH_DO_VLOG.format(path=x)),
                 files))
+
+    libraries_first_str = str()
+    if libraries_first:
+        libraries_first_str = f'-Lf {" ".join(libraries_first)}'
+
     content = _StringTemplate(TESTBENCH_DO_FILE).substitute(dict(
         includes='\n'.join(file_entries),
         entity=entity,
+        search_libraries_first=libraries_first_str,
     ))
     output_path.write_text(content)
 
@@ -116,10 +122,13 @@ def main():
     parser.add_argument(
         '-f', '--files', nargs='+', required=True, type=Path,
         help='(System)Verilog files to include in testbench.do to make testbench run')
+    parser.add_argument(
+        '--libs-first', nargs='*',
+        help='Add entries to Search Libraries First (-Lf), e.g. altera_mf_ver')
     args = parser.parse_args()
 
     generate_wave_do(args.entity, args.signals, output_path=Path(f'{args.entity}_wave.do'))
-    generate_testbench_do(args.entity, args.files, output_path=Path(f'{args.entity}_testbench.do'))
+    generate_testbench_do(args.entity, args.files, args.libs_first, output_path=Path(f'{args.entity}_testbench.do'))
 
 if __name__ == '__main__':
     main()
