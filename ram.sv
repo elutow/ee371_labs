@@ -24,10 +24,17 @@ module ram_testbench();
 	ram dut(.clk, .addr, .data_in, .write, .data_out);
 
 	initial begin
+		// Write values to two addresses
 		addr <= 5'h2A; write <= 1; data_in <= 4'b1010; @(posedge clk);
 		addr <= 5'h42; write <= 1; data_in <= 4'b0101; @(posedge clk);
-		addr <= 5'h2A; write <= 0; assert(data_out == 4'b1010); @(posedge clk);
-		addr <= 5'h42; assert(data_out == 4'b0101); @(posedge clk);
+		// Verify values written to two addresses
+		// It takes two clock cycles for the output to update
+		addr <= 5'h2A; write <= 0; data_in <= 4'bX; @(posedge clk);
+		@(posedge clk);
+		assert(data_out == 4'b1010);
+		addr <= 5'h42; @(posedge clk);
+		@(posedge clk);
+		assert(data_out == 4'b0101);
 		$stop;
 	end
 endmodule
