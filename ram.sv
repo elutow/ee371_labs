@@ -1,3 +1,11 @@
+// This module is a wrapper around ram32x4
+// - clk is the clock signal
+// - write is the write enable signal
+// - addr is the address port
+// - data_in and data_out are the data I/O ports
+//
+// Modular dependencies: ram32x4 (from IP Catalog)
+
 module ram(clk, addr, data_in, write, data_out);
 	input logic clk, write;
 	input logic [4:0] addr;
