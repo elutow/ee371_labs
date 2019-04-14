@@ -15,14 +15,16 @@
 // - ram32x4 (from IP Catalog)
 // - seg7
 
-module DE1_SoC(CLOCK_50, SW, KEY, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0);
+module DE1_SoC(CLOCK_50, SW, KEY, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0, r_address, data_out);
     input logic CLOCK_50;
     input logic [9:0] SW;
     input logic [3:0] KEY;
     output logic [6:0] HEX5, HEX4, HEX3, HEX2, HEX1, HEX0;
+    output logic [4:0] r_address;
+    output logic [3:0] data_out;
+    logic [4:0] w_address;
     logic reset, write_enable;
-    logic [4:0] r_address, w_address;
-    logic [3:0] data_in, data_out;
+    logic [3:0] data_in;
     logic [31:0] divided_clocks;
 
     // Filter metastability
