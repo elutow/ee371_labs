@@ -7,7 +7,8 @@ vlib work
 vlog "DE1_SoC.sv"
 vlog "seg7.sv"
 vlog "metastability_filter.sv"
-vlog "ram32x4.sv"
+vlog "clock_divider.sv"
+vlog "ram32x4.v"
 
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the

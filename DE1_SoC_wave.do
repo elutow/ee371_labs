@@ -5,9 +5,13 @@ add wave -noupdate /DE1_SoC_testbench/SW
 add wave -noupdate /DE1_SoC_testbench/KEY
 add wave -noupdate /DE1_SoC_testbench/HEX5
 add wave -noupdate /DE1_SoC_testbench/HEX4
+add wave -noupdate /DE1_SoC_testbench/HEX3
 add wave -noupdate /DE1_SoC_testbench/HEX2
+add wave -noupdate /DE1_SoC_testbench/HEX1
 add wave -noupdate /DE1_SoC_testbench/HEX0
-add wave -noupdate /DE1_SoC_testbench/dut/ram_clock
+add wave -noupdate /DE1_SoC_testbench/dut/r_address
+add wave -noupdate /DE1_SoC_testbench/dut/w_address
+add wave -noupdate /DE1_SoC_testbench/dut/data_in
 add wave -noupdate /DE1_SoC_testbench/dut/data_out
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {223 ps} 0}
