@@ -3,9 +3,9 @@
 // - SW[3:0] provide data input
 // - KEY[0] acts as the clock (pressed for 0, unpressed for 1)
 // - KEY[3] is a reset key activated when pressed
-// - HEX[5:4] show the current address in hex
-// - HEX[2] shows the RAM's input data in hex
-// - HEX[0] shows the RAM's output data in hex
+// - HEX5-4 show the current address in hex
+// - HEX2 shows the RAM's input data in hex
+// - HEX0 shows the RAM's output data in hex
 //
 // Modular dependencies:
 // - metastability_filter
