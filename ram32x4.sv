@@ -48,14 +48,14 @@ module ram32x4_testbench();
         reset <= 1; @(posedge clk);
         reset <= 0; @(posedge clk);
         // Write values to two addresses
-        address <= 5'h2A; write_enable <= 1; data_in <= 4'b1010; @(posedge clk);
-        address <= 5'h42; write_enable <= 1; data_in <= 4'b0101; @(posedge clk);
+        address <= 5'h15; write_enable <= 1; data_in <= 4'b1010; @(posedge clk);
+        address <= 5'h0A; write_enable <= 1; data_in <= 4'b0101; @(posedge clk);
         // Verify values written to two addresses
         // It takes two clock cycles for the output to update
-        address <= 5'h2A; write_enable <= 0; data_in <= 4'bX; @(posedge clk);
+        address <= 5'h15; write_enable <= 0; data_in <= 4'bX; @(posedge clk);
         @(posedge clk);
         assert(data_out == 4'b1010);
-        address <= 5'h42; @(posedge clk);
+        address <= 5'h0A; @(posedge clk);
         @(posedge clk);
         assert(data_out == 4'b0101);
         $stop;
