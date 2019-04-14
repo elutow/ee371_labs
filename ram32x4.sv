@@ -1,6 +1,5 @@
 // 32 x 4 single-port synchronous RAM implementation
 // - clk is the clock input, triggered at the positive edge
-// - reset sets all RAM values to zero
 // - address is the address for read/write_enable
 // - data_in is the data to write_enable
 // - write_enable indicates whether data should be written (1) or not (0)
@@ -9,20 +8,17 @@
 //
 // Modular dependencies: N/A
 
-module ram32x4(clk, reset, address, data_in, write_enable, data_out);
-    input logic clk, reset, write_enable;
+module ram32x4(clk, address, data_in, write_enable, data_out);
+    input logic clk, write_enable;
     input logic [4:0] address;
     input logic [3:0] data_in;
     output logic [3:0] data_out;
-    logic [3:0] memory_array [0:31];
+    // Declare and initialize to zeros
+    logic [3:0] memory_array [0:31] = '{default:'0};
 
     // Array I/O logic
     always_ff @(posedge clk) begin
-        if (reset) begin
-            // Reset all values to zero
-            memory_array <= '{default:'0};
-        end
-        else if (write_enable) begin
+        if (write_enable) begin
             memory_array[address] <= data_in;
         end
         data_out <= memory_array[address];
@@ -30,7 +26,7 @@ module ram32x4(clk, reset, address, data_in, write_enable, data_out);
 endmodule
 
 module ram32x4_testbench();
-    logic clk, reset, write_enable;
+    logic clk, write_enable;
     logic [4:0] address;
     logic [3:0] data_in;
     logic [3:0] data_out;
@@ -42,11 +38,9 @@ module ram32x4_testbench();
         forever #(CLOCK_PERIOD/2) clk <= ~clk;
     end
 
-    ram32x4 dut(.clk, .reset, .address, .data_in, .write_enable, .data_out);
+    ram32x4 dut(.clk, .address, .data_in, .write_enable, .data_out);
 
     initial begin
-        reset <= 1; @(posedge clk);
-        reset <= 0; @(posedge clk);
         // Write values to two addresses
         address <= 5'h15; write_enable <= 1; data_in <= 4'b1010; @(posedge clk);
         address <= 5'h0A; write_enable <= 1; data_in <= 4'b0101; @(posedge clk);

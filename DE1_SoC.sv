@@ -60,7 +60,7 @@ module DE1_SoC(CLOCK_50, SW, KEY, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0);
 
     // RAM module implementation
     ram32x4 ram_inst(
-        .clk(ram_clock), .reset, .address, .data_in, .write_enable, .data_out);
+        .clk(ram_clock), .address, .data_in, .write_enable, .data_out);
 endmodule
 
 module DE1_SoC_testbench();
@@ -91,12 +91,11 @@ module DE1_SoC_testbench();
     DE1_SoC dut(.CLOCK_50, .SW, .KEY, .HEX5, .HEX4, .HEX3, .HEX2, .HEX1, .HEX0);
 
     initial begin
-        addr <= 0; write_enable <= 0; data_in <= 0; ram_clock <= 0;
+        addr <= 0; write_enable <= 0; data_in <= 0; ram_clock <= 0; reset <= 0;
+        // Wait for reset metastability_filter to initialize
+        @(posedge CLOCK_50);
+        @(posedge CLOCK_50);
         reset <= 1; @(posedge CLOCK_50);
-        @(posedge CLOCK_50); // Wait for propagation through metastability_filter
-        // ram32x4 needs ram_clock to reset
-        ram_clock <= 1; @(posedge CLOCK_50);
-        ram_clock <= 0; @(posedge CLOCK_50);
         reset <= 0; @(posedge CLOCK_50);
         // Write values to two addresses
         addr <= 5'h15; write_enable <= 1; data_in <= 4'b1010; @(posedge CLOCK_50);

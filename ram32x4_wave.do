@@ -1,7 +1,6 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate /ram32x4_testbench/clk
-add wave -noupdate /ram32x4_testbench/reset
 add wave -noupdate /ram32x4_testbench/address
 add wave -noupdate /ram32x4_testbench/data_in
 add wave -noupdate /ram32x4_testbench/write_enable
