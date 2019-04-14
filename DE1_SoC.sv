@@ -97,17 +97,17 @@ module DE1_SoC_testbench();
         reset <= 1; @(posedge CLOCK_50);
         reset <= 0; @(posedge CLOCK_50);
         // Write values to two addresses
-        addr <= 5'h2A; write_enable <= 1; data_in <= 4'b1010; @(posedge CLOCK_50);
+        addr <= 5'h15; write_enable <= 1; data_in <= 4'b1010; @(posedge CLOCK_50);
         // Trigger RAM clock
         ram_clock <= 0; @(posedge CLOCK_50);
         ram_clock <= 1; @(posedge CLOCK_50);
-        addr <= 5'h42; write_enable <= 1; data_in <= 4'b0101; @(posedge CLOCK_50);
+        addr <= 5'h0A; write_enable <= 1; data_in <= 4'b0101; @(posedge CLOCK_50);
         // Trigger RAM clock
         ram_clock <= 0; @(posedge CLOCK_50);
         ram_clock <= 1; @(posedge CLOCK_50);
         // Verify values written to two addresses
         // It takes two RAM clock cycles for the output to update
-        addr <= 5'h2A; write_enable <= 0; data_in <= 4'bX; @(posedge CLOCK_50);
+        addr <= 5'h15; write_enable <= 0; data_in <= 4'bX; @(posedge CLOCK_50);
         // Trigger RAM clock
         ram_clock <= 0; @(posedge CLOCK_50);
         ram_clock <= 1; @(posedge CLOCK_50);
@@ -115,7 +115,7 @@ module DE1_SoC_testbench();
         ram_clock <= 1; @(posedge CLOCK_50);
         @(posedge CLOCK_50); // Wait for metastability_filter
         assert(data_out_seg7 == 7'b0001000); // 4'b1010
-        addr <= 5'h42; @(posedge CLOCK_50);
+        addr <= 5'h0A; @(posedge CLOCK_50);
         // Trigger RAM clock
         ram_clock <= 0; @(posedge CLOCK_50);
         ram_clock <= 1; @(posedge CLOCK_50);
