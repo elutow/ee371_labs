@@ -1,14 +1,11 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate /DE1_SoC_testbench/CLOCK_50
-add wave -noupdate /DE1_SoC_testbench/SW
-add wave -noupdate /DE1_SoC_testbench/KEY
-add wave -noupdate /DE1_SoC_testbench/HEX5
-add wave -noupdate /DE1_SoC_testbench/HEX4
-add wave -noupdate /DE1_SoC_testbench/HEX2
-add wave -noupdate /DE1_SoC_testbench/HEX0
-add wave -noupdate /DE1_SoC_testbench/dut/ram_clock
-add wave -noupdate /DE1_SoC_testbench/dut/data_out
+add wave -noupdate /ram32x4_testbench/clk
+add wave -noupdate /ram32x4_testbench/reset
+add wave -noupdate /ram32x4_testbench/address
+add wave -noupdate /ram32x4_testbench/data_in
+add wave -noupdate /ram32x4_testbench/write_enable
+add wave -noupdate /ram32x4_testbench/data_out
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {223 ps} 0}
 quietly wave cursor active 1

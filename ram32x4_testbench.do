@@ -4,20 +4,17 @@ vlib work
 # Compile Verilog
 #     All Verilog files that are part of this design should have
 #     their own "vlog" line below.
-vlog "DE1_SoC.sv"
-vlog "seg7.sv"
-vlog "metastability_filter.sv"
 vlog "ram32x4.sv"
 
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the
 #     testbench module you want to execute.
-vsim -voptargs="+acc" -t 1ps -Lf altera_mf_ver -lib work DE1_SoC_testbench
+vsim -voptargs="+acc" -t 1ps  -lib work ram32x4_testbench
 
 # Source the wave do file
 #     This should be the file that sets up the signal window for
 #     the module you are testing.
-do DE1_SoC_wave.do
+do ram32x4_wave.do
 
 # Set the window types
 view wave

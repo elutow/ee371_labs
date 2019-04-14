@@ -9,7 +9,7 @@
 //
 // Modular dependencies:
 // - metastability_filter
-// - ram32x4 (from IP Catalog)
+// - ram32x4
 // - seg7
 
 module DE1_SoC(CLOCK_50, SW, KEY, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0);
@@ -21,10 +21,14 @@ module DE1_SoC(CLOCK_50, SW, KEY, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0);
     logic [4:0] address;
     logic [3:0] data_in, data_out;
 
-    // Reset alias for metastability_filter
-    assign reset = ~KEY[3];
-
     // Filter metastability
+    metastability_filter reset_filter(
+        .clk(CLOCK_50),
+        // No reset needed; module will auto-initialize after two clock cycles
+        // from power-on.
+        .reset(1'b0),
+        .direct_in(~KEY[3]),
+        .filtered_out(reset));
     metastability_filter #(.WIDTH(5)) address_filter(
         .clk(CLOCK_50),
         .reset,
@@ -33,7 +37,7 @@ module DE1_SoC(CLOCK_50, SW, KEY, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0);
     metastability_filter ram_clock_filter(
         .clk(CLOCK_50),
         .reset,
-        .direct_in(KEY[0]),
+        .direct_in(~KEY[0]), // Make button press cause posedge
         .filtered_out(ram_clock));
     metastability_filter #(.WIDTH(4)) data_in_filter(
         .clk(CLOCK_50),
@@ -47,7 +51,6 @@ module DE1_SoC(CLOCK_50, SW, KEY, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0);
         .filtered_out(write_enable));
 
     // HEX display outputs in descending order
-    assign HEX6 = 7'b1111111;
     seg7 addr1_seg7(.hex({3'b0, address[4]}), .out(HEX5));
     seg7 addr0_seg7(.hex(address[3:0]), .out(HEX4));
     assign HEX3 = 7'b1111111;
@@ -57,14 +60,9 @@ module DE1_SoC(CLOCK_50, SW, KEY, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0);
 
     // RAM module implementation
     ram32x4 ram_inst(
-        .address,
-        .clock(ram_clock),
-        .data(data_in),
-        .wren(write_enable),
-        .q(data_out));
+        .clk(ram_clock), .reset, .address, .data_in, .write_enable, .data_out);
 endmodule
 
-`timescale 1 ps / 1 ps
 module DE1_SoC_testbench();
     logic CLOCK_50;
     logic [9:0] SW;
@@ -76,7 +74,7 @@ module DE1_SoC_testbench();
     logic [3:0] data_in;
     logic [7:0] data_out_seg7;
 
-    assign KEY[0] = ram_clock;
+    assign KEY[0] = ~ram_clock;
     assign KEY[3] = ~reset;
     assign SW[9] = write_enable;
     assign SW[8:4] = addr;
@@ -93,34 +91,38 @@ module DE1_SoC_testbench();
     DE1_SoC dut(.CLOCK_50, .SW, .KEY, .HEX5, .HEX4, .HEX3, .HEX2, .HEX1, .HEX0);
 
     initial begin
-        addr <= 0; write_enable <= 0; data_in <= 0; ram_clock <= 1;
+        addr <= 0; write_enable <= 0; data_in <= 0; ram_clock <= 0;
         reset <= 1; @(posedge CLOCK_50);
+        @(posedge CLOCK_50); // Wait for propagation through metastability_filter
+        // ram32x4 needs ram_clock to reset
+        ram_clock <= 1; @(posedge CLOCK_50);
+        ram_clock <= 0; @(posedge CLOCK_50);
         reset <= 0; @(posedge CLOCK_50);
         // Write values to two addresses
         addr <= 5'h2A; write_enable <= 1; data_in <= 4'b1010; @(posedge CLOCK_50);
         // Trigger RAM clock
-        ram_clock <= 0; @(posedge CLOCK_50);
         ram_clock <= 1; @(posedge CLOCK_50);
+        ram_clock <= 0; @(posedge CLOCK_50);
         addr <= 5'h42; write_enable <= 1; data_in <= 4'b0101; @(posedge CLOCK_50);
         // Trigger RAM clock
-        ram_clock <= 0; @(posedge CLOCK_50);
         ram_clock <= 1; @(posedge CLOCK_50);
+        ram_clock <= 0; @(posedge CLOCK_50);
         // Verify values written to two addresses
         // It takes two RAM clock cycles for the output to update
         addr <= 5'h2A; write_enable <= 0; data_in <= 4'bX; @(posedge CLOCK_50);
         // Trigger RAM clock
-        ram_clock <= 0; @(posedge CLOCK_50);
         ram_clock <= 1; @(posedge CLOCK_50);
         ram_clock <= 0; @(posedge CLOCK_50);
         ram_clock <= 1; @(posedge CLOCK_50);
+        ram_clock <= 0; @(posedge CLOCK_50);
         @(posedge CLOCK_50); // Wait for metastability_filter
         assert(data_out_seg7 == 7'b0001000); // 4'b1010
         addr <= 5'h42; @(posedge CLOCK_50);
         // Trigger RAM clock
-        ram_clock <= 0; @(posedge CLOCK_50);
         ram_clock <= 1; @(posedge CLOCK_50);
         ram_clock <= 0; @(posedge CLOCK_50);
         ram_clock <= 1; @(posedge CLOCK_50);
+        ram_clock <= 0; @(posedge CLOCK_50);
         @(posedge CLOCK_50); // Wait for metastability_filter
         assert(data_out_seg7 == 7'b0010010); // 4'b0101;
         $stop;
