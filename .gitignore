@@ -9,6 +9,7 @@
 # Files
 /*.bak
 /*.qws
+/*.ver
 /c5_pin_model_dump.txt
 /transcript
 /vsim.wlf
