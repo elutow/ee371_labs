@@ -25,5 +25,13 @@ checkusb:
 program: output_files
 	quartus_pgm -c 'DE-SoC' ProgramTheDE1_SoC.cdf
 
+enable_signaltap: DE1_SoC.stp
+       # Needs DE1_SoC.stp file created manually
+       quartus_stp DE1_SoC --signaltap --stp_file=DE1_SoC.stp --logic_analyzer_interface --enable
+
+signaltap: output_files DE1_SoC.stp
+       # Needs DE1_SoC.stp file created manually
+       quartus_stpw DE1_SoC.stp
+
 qhelp:
 	quartus_sh --qhelp
