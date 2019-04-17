@@ -47,7 +47,6 @@ module DE1_SoC(CLOCK_50, SW, KEY, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0);
         .filtered_out(write_enable));
 
     // HEX display outputs in descending order
-    assign HEX6 = 7'b1111111;
     seg7 addr1_seg7(.hex({3'b0, address[4]}), .out(HEX5));
     seg7 addr0_seg7(.hex(address[3:0]), .out(HEX4));
     assign HEX3 = 7'b1111111;
