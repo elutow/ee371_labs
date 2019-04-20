@@ -68,7 +68,7 @@ module line_animator(clk, reset, update_event, x, y, pixel_color);
                 pixel_color = 0;
                 if (draw_done) begin
                     drawer_reset = 1;
-                    next_step = step + 1;
+                    next_step = step + 6'b1;
                     ns = STATE_DRAW;
                 end
                 else begin
