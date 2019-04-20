@@ -6,6 +6,7 @@
 // Modular dependencies:
 // - VGA_framebuffer
 // - clock_divider
+// - clock_pulser
 // - line_animator
 // - metastability_filter
 
@@ -44,6 +45,8 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
     logic [10:0] x_vga, y_vga;
     // From clock_divider
     logic [31:0] divided_clocks;
+    // For triggering line animation step
+    logic update_event;
     // Alias for reset
     logic reset;
 
@@ -60,12 +63,16 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
 
     // For update event
     clock_divider clocks(.input_clock(CLOCK_50), .reset, .divided_clocks);
+    clock_pulser event_pulser(
+        .clk(CLOCK_50), .reset,
+        .divided_clock(divided_clocks[21]), // 12 Hz
+        .clock_event(update_event));
 
     // Line animator
     // NOTE: drawing is not synchronized with VGA clock; this may cause
     // tearing since the VGA only has a single frame buffer
     line_animator animator(
-        .clk(CLOCK_50), .reset, .update_event(divided_clocks[21]), // 12 Hz
+        .clk(CLOCK_50), .reset, .update_event,
         .x(x_anim), .y(y_anim), .pixel_color);
 
     // Combinational logic for screen blacking FSM

@@ -6,6 +6,7 @@ vlib work
 #     their own "vlog" line below.
 vlog "DE1_SoC.sv"
 vlog "VGA_framebuffer.sv"
+vlog "clock_pulser.sv"
 vlog "clock_divider.sv"
 vlog "line_animator.sv"
 vlog "line_drawer.sv"
