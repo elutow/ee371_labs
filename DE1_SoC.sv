@@ -35,9 +35,10 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
 
     logic [10:0] x0, y0, x1, y1, x, y;
 
-    // Alias for reset
+    // reset for circuit
     logic reset;
-    assign reset = SW[9];
+    metastability_filter reset_filter(
+        .clk(CLOCK_50), .reset(1'b0), .direct_in(SW[9]), .filtered_out(reset));
 
     VGA_framebuffer fb(.clk50(CLOCK_50), .reset, .x, .y,
                 .pixel_color(1'b1), .pixel_write(1'b1),
@@ -48,8 +49,17 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
                 .x0, .y0, .x1, .y1, .x, .y);
 
     // Assign line target coordinates
-    assign x0 = SW[4:0] * 10;
-    assign y0 = SW[8:5] * 10;
+    // x coordinate
+    logic [4:0] x_in;
+    metastability_filter #(.WIDTH(5)) x_in_filter(
+        .clk(CLOCK_50), .reset, .direct_in(SW[4:0]), .filtered_out(x_in));
+    assign x0 = x_in * 5'd10;
+    // y coordinate
+    logic [3:0] y_in;
+    metastability_filter #(.WIDTH(4)) y_in_filter(
+        .clk(CLOCK_50), .reset, .direct_in(SW[8:5]), .filtered_out(y_in));
+    assign y0 = y_in * 4'd10;
+    // Hardcode endpoints for simplicity
     assign x1 = 240;
     assign y1 = 240;
 endmodule
@@ -85,6 +95,7 @@ module DE1_SoC_testbench();
         x_in <= 0; y_in <= 0;
         reset <= 1; @(posedge CLOCK_50);
         reset <= 0; @(posedge CLOCK_50);
+        @(posedge CLOCK_50); // Wait for metastability_filter
         // Check if line draws
         for (i=0; i<40; i++) begin
             @(posedge CLOCK_50);
