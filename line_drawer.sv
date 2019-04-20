@@ -219,6 +219,25 @@ module line_drawer_testbench();
         @(posedge clk);
             assert(x == 2);
             assert(y == 5);
+        // Try non-origin coordinates
+        x0 <= 6; y0 <= 6; x1 <= 3; y1 <= 3;
+        reset <= 1; @(posedge clk);
+        reset <= 0; @(posedge clk);
+            assert(x == 3);
+            assert(y == 3);
+        @(posedge clk);
+            assert(x == 4);
+            assert(y == 4);
+        @(posedge clk);
+            assert(x == 5);
+            assert(y == 5);
+        @(posedge clk);
+            assert(x == 6);
+            assert(y == 6);
+        // Should stay at endpoint
+        @(posedge clk);
+            assert(x == 6);
+            assert(y == 6);
         $stop;
     end
 endmodule
