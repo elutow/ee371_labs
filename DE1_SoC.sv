@@ -1,11 +1,13 @@
-// Top-level module to test line_drawer via VGA output
-// - SW[9] is reset for line_drawer
-// - SW[4:0] is x-coordinate in tens of pixels
-// - SW[8:5] is y-coordinate in tens of pixels
+// Top-level module for animating a translating line
+// - SW[9] will set the screen to black when flipped on.
+//   Once it is flipped off, the drawing will start again.
+//   The switch should be left on until the entire screen is black.
 //
 // Modular dependencies:
-// - line_drawer
 // - VGA_framebuffer
+// - clock_divider
+// - line_animator
+// - metastability_filter
 
 module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
     VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS);
@@ -33,25 +35,61 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
     assign HEX5 = '1;
     assign LEDR = SW;
 
-    logic [10:0] x0, y0, x1, y1, x, y;
-
+    // From line_animator
+    logic [10:0] x_anim, y_anim, pixel_color;
+    // For blacking out the VGA
+    logic [10:0] x_clear = 0, y_clear = 0;
+    // To pass into VGA
+    logic [10:0] x_vga, y_vga;
     // Alias for reset
     logic reset;
-    assign reset = SW[9];
 
-    VGA_framebuffer fb(.clk50(CLOCK_50), .reset, .x, .y,
-                .pixel_color(1'b1), .pixel_write(1'b1),
-                .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
-                .VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
+    // Filter reset metastability
+    metastability_filter reset_filter(
+        .clk(CLOCK_50), .reset(1'b0), .direct_in(SW[9]), .filtered_out(reset));
 
-    line_drawer lines (.clk(CLOCK_50), .reset,
-                .x0, .y0, .x1, .y1, .x, .y);
+    // VGA framebuffer
+    VGA_framebuffer fb(
+        .clk50(CLOCK_50), .reset, .x(x_vga), .y(y_vga),
+        .pixel_color, .pixel_write(1'b1),
+        .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
+        .VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
 
-    // Assign line target coordinates
-    assign x0 = SW[4:0] * 10;
-    assign y0 = SW[8:5] * 10;
-    assign x1 = 240;
-    assign y1 = 240;
+    // Line animator
+    // TODO: update_event via clock_divider
+    line_animator animator(
+        .clk(CLOCK_50), .reset, .update_event(TODO),
+        .x(x_anim), .y(y_anim), .pixel_color);
+
+    // Combinational logic for screen blacking FSM
+    always_comb begin
+        if (reset) begin
+            // NOTE: During reset, pixel_color will always be 0.
+            // NOTE: x_vga and y_vga must be bounded by 640 x 480 resolution;
+            // otherwise, the write address will go out of range in the
+            // framebuffer (resulting in undefined behavior)
+            x_vga = x_clear + 1;
+            if (x_vga == 640) begin
+                x_vga = 0;
+                y_vga = y_clear + 1;
+                if (y_vga == 480) begin
+                    y_vga = 0;
+                end
+            end
+        end
+        else begin
+            x_vga = x_anim;
+            y_vga = y_anim;
+        end
+    end
+
+    // DFFs for screen blacking FSM
+    always_ff @(posedge CLOCK_50) begin
+        if (reset) begin
+            x_clear <= x_vga;
+            y_clear <= y_vga;
+        end
+    end
 endmodule
 
 module DE1_SoC_testbench();
@@ -65,10 +103,6 @@ module DE1_SoC_testbench();
 
     logic reset;
     assign SW[9] = reset;
-    logic [4:0] x_in;
-    assign SW[4:0] = x_in;
-    logic [3:0] y_in;
-    assign SW[8:5] = y_in;
 
     DE1_SoC dut(.HEX0, .HEX1, .HEX2, .HEX3, .HEX4, .HEX5, .KEY, .LEDR, .SW, .CLOCK_50,
     .VGA_R, .VGA_G, .VGA_B, .VGA_BLANK_N, .VGA_CLK, .VGA_HS, .VGA_SYNC_N, .VGA_VS);
@@ -85,8 +119,15 @@ module DE1_SoC_testbench();
         x_in <= 0; y_in <= 0;
         reset <= 1; @(posedge CLOCK_50);
         reset <= 0; @(posedge CLOCK_50);
+        @(posedge CLOCK_50); // Wait for metastability_filter
         // Check if line draws
         for (i=0; i<40; i++) begin
+            @(posedge CLOCK_50);
+        end
+        // Check screen blacking
+        reset <= 1; @(posedge CLOCK_50);
+        @(posedge CLOCK_50); // Wait for metastability_filter
+        for (i=0; i<642; i++) begin
             @(posedge CLOCK_50);
         end
         $stop;
