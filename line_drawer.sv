@@ -63,8 +63,8 @@ module line_drawer(
     assign deltay = `abs_diff(y1_swp, y0_swp);
 
     // Compute y_step
-    logic signed [1:0] y_step;
-    assign y_step = y0_swp < y1_swp ? 1 : -1;
+    logic signed [11:0] y_step;
+    assign y_step = y0_swp < y1_swp ? 12'b1 : -12'b1;
 
     // Define error registers
     logic signed [11:0] error, next_error;
@@ -191,34 +191,28 @@ module line_drawer_testbench();
         @(posedge clk);
             assert(x == 3);
             assert(y == 3);
-        // Irregular angled line
-        x0 <= 0; y0 <= 0; x1 <= 2; y1 <= 5;
+        // Test negative y_step
+        x0 <= 5; y0 <= 0; x1 <= 2; y1 <= 2;
         reset <= 1; @(posedge clk);
         reset <= 0; @(posedge clk);
-            assert(x == 0);
-            assert(y == 0);
-        @(posedge clk);
-            assert(x == 1);
-            assert(y == 1);
-        @(posedge clk);
-            assert(x == 1);
+            assert(x == 2);
             assert(y == 2);
         @(posedge clk);
-            assert(x == 1);
-            assert(y == 3);
+            assert(x == 3);
+            assert(y == 1);
         @(posedge clk);
-            assert(x == 2);
-            assert(y == 4);
+            assert(x == 4);
+            assert(y == 0);
         @(posedge clk);
-            assert(x == 2);
-            assert(y == 5);
+            assert(x == 5);
+            assert(y == 0);
         // Should stay at endpoint
         @(posedge clk);
-            assert(x == 2);
-            assert(y == 5);
+            assert(x == 5);
+            assert(y == 0);
         @(posedge clk);
-            assert(x == 2);
-            assert(y == 5);
+            assert(x == 5);
+            assert(y == 0);
         $stop;
     end
 endmodule
