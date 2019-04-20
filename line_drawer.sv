@@ -2,7 +2,7 @@
 // - reset causes the line drawer to prepare rendering a new line. The values
 //   of the inputs during the reset must already be for the new line.
 // - x0, y0, x1, y1 are the source and destination coordinates of the lines.
-//   These should not be changed until the line is updated.
+//   These should not be changed until the line is fully drawn.
 // - x and y are the pixels to draw on the screen for the line. When the line
 //   is finished drawing, these coordinates will remain at (x1, y1) until
 //   reset.
