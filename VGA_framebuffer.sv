@@ -75,7 +75,7 @@ module VGA_framebuffer(
 
    // Framebuffer memory: 640 x 480 = 307200 bits
 
-   logic framebuffer [307199:0];
+   logic framebuffer [307199:0] = '{default:'0};
    logic [18:0] read_address, write_address;
 
    assign write_address = x + (y << 9) + (y << 7) ; // x + y * 640
