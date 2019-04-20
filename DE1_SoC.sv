@@ -1,4 +1,13 @@
-module DE1_SoC (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
+// Top-level module to test line_drawer via VGA output
+// - SW[9] is reset for line_drawer
+// - SW[4:0] is x-coordinate in tens of pixels
+// - SW[8:5] is y-coordinate in tens of pixels
+//
+// Modular dependencies:
+// - line_drawer
+// - VGA_framebuffer
+
+module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
     VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS);
 
     output logic [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
@@ -26,18 +35,60 @@ module DE1_SoC (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
 
     logic [10:0] x0, y0, x1, y1, x, y;
 
-    VGA_framebuffer fb(.clk50(CLOCK_50), .reset(1'b0), .x, .y,
+    logic reset;
+    assign reset = SW[9];
+
+    VGA_framebuffer fb(.clk50(CLOCK_50), .reset, .x, .y,
                 .pixel_color(1'b1), .pixel_write(1'b1),
                 .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
                 .VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
 
-    line_drawer lines (.clk(CLOCK_50), .reset(1'b0),
+    line_drawer lines (.clk(CLOCK_50), .reset,
                 .x0, .y0, .x1, .y1, .x, .y);
 
-    assign x0 = 0;
-    assign y0 = 0;
+    assign x0 = SW[4:0] * 10;
+    assign y0 = SW[8:5] * 10;
     assign x1 = 240;
     assign y1 = 240;
+endmodule
+
+module DE1_SoC_testbench();
+    logic [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
+    logic [9:0] LEDR;
+    logic [3:0] KEY;
+    logic [9:0] SW;
+
+    logic CLOCK_50, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS;
+    logic [7:0] VGA_R, VGA_G, VGA_B;
+
+    logic reset;
+    assign SW[9] = reset;
+    logic [4:0] x_in;
+    assign SW[4:0] = x_in;
+    logic [3:0] y_in;
+    assign SW[8:5] = y_in;
+
+    DE1_SoC dut(.HEX0, .HEX1, .HEX2, .HEX3, .HEX4, .HEX5, .KEY, .LEDR, .SW, .CLOCK_50,
+    .VGA_R, .VGA_G, .VGA_B, .VGA_BLANK_N, .VGA_CLK, .VGA_HS, .VGA_SYNC_N, .VGA_VS);
+
+    // Clock
+    parameter CLOCK_PERIOD=100;
+    initial begin
+        CLOCK_50 <= 0;
+        forever #(CLOCK_PERIOD/2) CLOCK_50 <= ~CLOCK_50;
+    end
+
+    int i;
+    initial begin
+        x_in <= 0; y_in <= 0;
+        reset <= 1; @(posedge CLOCK_50);
+        reset <= 0; @(posedge CLOCK_50);
+        // Check if line draws
+        for (i=0; i<40; i++) begin
+            @(posedge CLOCK_50);
+        end
+        $stop;
+    end
 endmodule
 
 // vim: set expandtab shiftwidth=4 softtabstop=4:
