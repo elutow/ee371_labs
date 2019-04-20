@@ -53,7 +53,7 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
 
     // VGA framebuffer
     VGA_framebuffer fb(
-        .clk50(CLOCK_50), .reset, .x(x_vga), .y(y_vga),
+        .clk50(CLOCK_50), .reset(1'b0), .x(x_vga), .y(y_vga),
         .pixel_color, .pixel_write(1'b1),
         .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
         .VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
