@@ -8,6 +8,7 @@ add wave -noupdate /line_drawer_testbench/x1
 add wave -noupdate /line_drawer_testbench/y1
 add wave -noupdate /line_drawer_testbench/x
 add wave -noupdate /line_drawer_testbench/y
+add wave -noupdate /line_drawer_testbench/finished
 add wave -noupdate /line_drawer_testbench/dut/x_int
 add wave -noupdate /line_drawer_testbench/dut/y_int
 add wave -noupdate /line_drawer_testbench/dut/x0_swp

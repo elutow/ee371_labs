@@ -14,7 +14,8 @@
 module line_drawer(
     input logic clk, reset,
     input logic [10:0] x0, y0, x1, y1, //the end points of the line
-    output logic [10:0] x, y //outputs corresponding to the pair (x, y)
+    output logic [10:0] x, y, //outputs corresponding to the pair (x, y)
+    output logic finished //indicates when drawing has finished
     );
 
     // Compute is_steep
@@ -71,8 +72,6 @@ module line_drawer(
 
     // Define internal x and y coordinates
     logic [10:0] x_int, y_int, next_x_int, next_y_int;
-    // Indicates when drawing is completed
-    logic finished;
 
     // Compute next drawing state values
     always_comb begin
@@ -119,7 +118,7 @@ module line_drawer(
 endmodule
 
 module line_drawer_testbench();
-    logic clk, reset;
+    logic clk, reset, finished;
     logic [10:0] x0, y0, x1, y1, x, y;
 
     // Clock
@@ -129,7 +128,7 @@ module line_drawer_testbench();
         forever #(CLOCK_PERIOD/2) clk <= ~clk;
     end
 
-    line_drawer dut(.clk, .reset, .x0, .y0, .x1, .y1, .x, .y);
+    line_drawer dut(.clk, .reset, .x0, .y0, .x1, .y1, .x, .y, .finished);
 
     initial begin
         // Horizontal line

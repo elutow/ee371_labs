@@ -33,10 +33,9 @@ module line_animator(clk, reset, update_event, x, y, pixel_color);
     enum { STATE_INIT, STATE_DRAW, STATE_ERASE } ps, ns;
 
     line_drawer drawer(
-        .clk, .reset(drawer_reset), .x0, .y0, .x1, .y1, .x, .y);
-
-    // Drawing is done when last pixel is reached.
-    assign draw_done = (x == x1) && (y == y1);
+        .clk, .reset(drawer_reset),
+        .x0, .y0, .x1, .y1, .x, .y,
+        .finished(draw_done));
 
     // Define line coordinates
     assign x0 = step;
