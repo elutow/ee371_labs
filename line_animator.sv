@@ -41,8 +41,8 @@ module line_animator(clk, reset, update_event, x, y, pixel_color);
     // Define line coordinates
     assign x0 = step;
     assign y0 = step;
-    assign x1 = step + 10;
-    assign y1 = step + 15;
+    assign x1 = step + 11'd10;
+    assign y1 = step + 11'd15;
 
     // Combinational logic for drawing FSM
     always_comb begin

@@ -64,7 +64,7 @@ module line_drawer(
 
     // Compute y_step
     logic signed [1:0] y_step;
-    assign y_step = y0_swp < y1_swp ? 1 : -1;
+    assign y_step = y0_swp < y1_swp ? 2'b1 : -2'b1;
 
     // Define error registers
     logic signed [11:0] error, next_error;
@@ -85,7 +85,7 @@ module line_drawer(
                 next_y_int = y_int + y_step;
                 next_error = next_error - deltax;
             end
-            next_x_int = x_int + 1;
+            next_x_int = x_int + 11'b1;
         end
     end
 
@@ -94,7 +94,7 @@ module line_drawer(
         if (reset) begin
             x_int <= x0_swp;
             y_int <= y0_swp;
-            error <= -(deltax / 2);
+            error <= '{-(deltax / 2)};
             finished <= 0;
         end
         else begin

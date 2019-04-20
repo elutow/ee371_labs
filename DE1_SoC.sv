@@ -75,10 +75,11 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
             // NOTE: x_vga and y_vga must be bounded by 640 x 480 resolution;
             // otherwise, the write address will go out of range in the
             // framebuffer (resulting in undefined behavior)
-            x_vga = x_clear + 1;
+            x_vga = x_clear + 11'b1;
+            y_vga = y_clear;
             if (x_vga == 640) begin
                 x_vga = 0;
-                y_vga = y_clear + 1;
+                y_vga = y_clear + 11'b1;
                 if (y_vga == 480) begin
                     y_vga = 0;
                 end
