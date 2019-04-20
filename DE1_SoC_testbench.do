@@ -6,7 +6,10 @@ vlib work
 #     their own "vlog" line below.
 vlog "DE1_SoC.sv"
 vlog "VGA_framebuffer.sv"
+vlog "clock_divider.sv"
+vlog "line_animator.sv"
 vlog "line_drawer.sv"
+vlog "metastability_filter.sv"
 
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the

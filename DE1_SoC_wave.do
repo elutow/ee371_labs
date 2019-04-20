@@ -2,16 +2,21 @@ onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate /DE1_SoC_testbench/CLOCK_50
 add wave -noupdate /DE1_SoC_testbench/SW
-add wave -noupdate /DE1_SoC_testbench/dut/x
-add wave -noupdate /DE1_SoC_testbench/dut/y
-add wave -noupdate /DE1_SoC_testbench/dut/VGA_R
-add wave -noupdate /DE1_SoC_testbench/dut/VGA_G
-add wave -noupdate /DE1_SoC_testbench/dut/VGA_B
-add wave -noupdate /DE1_SoC_testbench/dut/VGA_BLANK_N
-add wave -noupdate /DE1_SoC_testbench/dut/VGA_CLK
-add wave -noupdate /DE1_SoC_testbench/dut/VGA_HS
-add wave -noupdate /DE1_SoC_testbench/dut/VGA_SYNC_N
-add wave -noupdate /DE1_SoC_testbench/dut/VGA_VS
+add wave -noupdate /DE1_SoC_testbench/VGA_R
+add wave -noupdate /DE1_SoC_testbench/VGA_G
+add wave -noupdate /DE1_SoC_testbench/VGA_B
+add wave -noupdate /DE1_SoC_testbench/VGA_BLANK_N
+add wave -noupdate /DE1_SoC_testbench/VGA_CLK
+add wave -noupdate /DE1_SoC_testbench/VGA_HS
+add wave -noupdate /DE1_SoC_testbench/VGA_SYNC_N
+add wave -noupdate /DE1_SoC_testbench/VGA_VS
+add wave -noupdate /DE1_SoC_testbench/dut/reset
+add wave -noupdate /DE1_SoC_testbench/dut/x_vga
+add wave -noupdate /DE1_SoC_testbench/dut/y_vga
+add wave -noupdate /DE1_SoC_testbench/dut/x_anim
+add wave -noupdate /DE1_SoC_testbench/dut/y_anim
+add wave -noupdate /DE1_SoC_testbench/dut/x_clear
+add wave -noupdate /DE1_SoC_testbench/dut/y_clear
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {223 ps} 0}
 quietly wave cursor active 1

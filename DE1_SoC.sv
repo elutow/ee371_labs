@@ -36,11 +36,14 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
     assign LEDR = SW;
 
     // From line_animator
-    logic [10:0] x_anim, y_anim, pixel_color;
+    logic [10:0] x_anim, y_anim;
+    logic pixel_color;
     // For blacking out the VGA
     logic [10:0] x_clear = 0, y_clear = 0;
     // To pass into VGA
     logic [10:0] x_vga, y_vga;
+    // From clock_divider
+    logic [31:0] divided_clocks;
     // Alias for reset
     logic reset;
 
@@ -55,10 +58,14 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
         .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
         .VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
 
+    // For update event
+    clock_divider clocks(.input_clock(CLOCK_50), .reset, .divided_clocks);
+
     // Line animator
-    // TODO: update_event via clock_divider
+    // NOTE: drawing is not synchronized with VGA clock; this may cause
+    // tearing since the VGA only has a single frame buffer
     line_animator animator(
-        .clk(CLOCK_50), .reset, .update_event(TODO),
+        .clk(CLOCK_50), .reset, .update_event(divided_clocks[21]), // 12 Hz
         .x(x_anim), .y(y_anim), .pixel_color);
 
     // Combinational logic for screen blacking FSM
@@ -116,7 +123,6 @@ module DE1_SoC_testbench();
 
     int i;
     initial begin
-        x_in <= 0; y_in <= 0;
         reset <= 1; @(posedge CLOCK_50);
         reset <= 0; @(posedge CLOCK_50);
         @(posedge CLOCK_50); // Wait for metastability_filter
