@@ -35,6 +35,7 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
 
     logic [10:0] x0, y0, x1, y1, x, y;
 
+    // Alias for reset
     logic reset;
     assign reset = SW[9];
 
@@ -46,6 +47,7 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
     line_drawer lines (.clk(CLOCK_50), .reset,
                 .x0, .y0, .x1, .y1, .x, .y);
 
+    // Assign line target coordinates
     assign x0 = SW[4:0] * 10;
     assign y0 = SW[8:5] * 10;
     assign x1 = 240;
