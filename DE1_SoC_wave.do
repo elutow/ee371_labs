@@ -11,6 +11,7 @@ add wave -noupdate /DE1_SoC_testbench/VGA_HS
 add wave -noupdate /DE1_SoC_testbench/VGA_SYNC_N
 add wave -noupdate /DE1_SoC_testbench/VGA_VS
 add wave -noupdate /DE1_SoC_testbench/dut/reset
+add wave -noupdate /DE1_SoC_testbench/dut/pixel_color
 add wave -noupdate /DE1_SoC_testbench/dut/x_vga
 add wave -noupdate /DE1_SoC_testbench/dut/y_vga
 add wave -noupdate /DE1_SoC_testbench/dut/x_anim

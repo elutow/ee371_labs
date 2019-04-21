@@ -78,7 +78,8 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
     // Combinational logic for screen blacking FSM
     always_comb begin
         if (reset) begin
-            // NOTE: During reset, pixel_color will always be 0.
+            // NOTE: During reset, pixel_color will always be 0 from
+            // line_animator
             // NOTE: x_vga and y_vga must be bounded by 640 x 480 resolution;
             // otherwise, the write address will go out of range in the
             // framebuffer (resulting in undefined behavior)
