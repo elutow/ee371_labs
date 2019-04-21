@@ -4,8 +4,9 @@
 // - SW[8:5] is y-coordinate in tens of pixels
 //
 // Modular dependencies:
-// - line_drawer
 // - VGA_framebuffer
+// - line_drawer
+// - metastability_filter
 
 module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
     VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS);
