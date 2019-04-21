@@ -64,8 +64,8 @@ module line_drawer(
     assign deltay = `abs_diff(y1_swp, y0_swp);
 
     // Compute y_step
-    logic signed [11:0] y_step;
-    assign y_step = y0_swp < y1_swp ? 12'b1 : -12'b1;
+    logic signed [10:0] y_step;
+    assign y_step = y0_swp < y1_swp ? 11'b1 : -11'b1;
 
     // Define error registers
     logic signed [11:0] error, next_error;
