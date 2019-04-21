@@ -28,7 +28,7 @@ module line_animator(clk, reset, update_event, x, y, pixel_color);
     // Target line coordinates for line_drawer
     logic [10:0] x0, y0, x1, y1;
     // Animation step
-    logic [5:0] step, next_step;
+    logic [7:0] step, next_step;
     // States for drawing FSM
     enum { STATE_INIT, STATE_DRAW, STATE_ERASE } ps, ns;
 
@@ -40,8 +40,8 @@ module line_animator(clk, reset, update_event, x, y, pixel_color);
     // Define line coordinates
     assign x0 = step;
     assign y0 = step;
-    assign x1 = step + 11'd10;
-    assign y1 = step + 11'd15;
+    assign x1 = step + 11'd30;
+    assign y1 = step + 11'd20;
 
     // Combinational logic for drawing FSM
     always_comb begin
@@ -67,7 +67,7 @@ module line_animator(clk, reset, update_event, x, y, pixel_color);
                 pixel_color = 0;
                 if (draw_done) begin
                     drawer_reset = 1;
-                    next_step = step + 6'b1;
+                    next_step = step + 8'b1;
                     ns = STATE_DRAW;
                 end
                 else begin
@@ -109,13 +109,13 @@ module line_animator_testbench();
         update_event <= 0;
         reset <= 1; @(posedge clk);
         reset <= 0; @(posedge clk);
-        for (i=0; i<20; i++) begin
+        for (i=0; i<35; i++) begin
             @(posedge clk);
         end
         // Trigger update_event for erasing
         update_event <= 1; @(posedge clk);
         update_event <= 0; @(posedge clk);
-        for (i=0; i<40; i++) begin
+        for (i=0; i<35; i++) begin
             @(posedge clk);
         end
         $stop;
