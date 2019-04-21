@@ -65,7 +65,7 @@ module DE1_SoC(HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50,
     clock_divider clocks(.input_clock(CLOCK_50), .reset, .divided_clocks);
     clock_pulser event_pulser(
         .clk(CLOCK_50), .reset,
-        .divided_clock(divided_clocks[21]), // 12 Hz
+        .divided_clock(divided_clocks[19]), // 48 Hz
         .clock_event(update_event));
 
     // Line animator
