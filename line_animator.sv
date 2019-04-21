@@ -30,7 +30,7 @@ module line_animator(clk, reset, update_event, x, y, pixel_color);
     // Animation step
     logic [7:0] step, next_step;
     // States for drawing FSM
-    enum { STATE_INIT, STATE_DRAW, STATE_ERASE } ps, ns;
+    enum { STATE_INIT, STATE_DRAW, STATE_ERASE, STATE_PREDRAW } ps, ns;
 
     line_drawer drawer(
         .clk, .reset(drawer_reset),
@@ -66,13 +66,20 @@ module line_animator(clk, reset, update_event, x, y, pixel_color);
             STATE_ERASE: begin
                 pixel_color = 0;
                 if (draw_done) begin
-                    drawer_reset = 1;
                     next_step = step + 8'b1;
-                    ns = STATE_DRAW;
+                    ns = STATE_PREDRAW;
                 end
                 else begin
                     ns = STATE_ERASE;
                 end
+            end
+            STATE_PREDRAW: begin
+                // This state is needed to let step update
+                // so that the correct starting coordinate is passed into
+                // line_drawer
+                drawer_reset = 1;
+                pixel_color = 0;
+                ns = STATE_DRAW;
             end
         endcase
     end
@@ -116,6 +123,12 @@ module line_animator_testbench();
         update_event <= 1; @(posedge clk);
         update_event <= 0; @(posedge clk);
         for (i=0; i<35; i++) begin
+            @(posedge clk);
+        end
+        // Ensure transition into next line is correct
+        update_event <= 1; @(posedge clk);
+        update_event <= 0; @(posedge clk);
+        for (i=0; i<5; i++) begin
             @(posedge clk);
         end
         $stop;
