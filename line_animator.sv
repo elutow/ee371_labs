@@ -2,6 +2,11 @@
 // The animation follows the given sequence:
 // 1. Draw diagonal line starting at (0, 0)
 // 2. Translate it by vector (1, 1) for 128 update events
+//    a. For steps 1-32, the line will be shallow with a positive slope
+//    (relative to VGA coordinates)
+//    b. For steps 33-64, the line will be steep with a positive slope
+//    c. For steps 65-96, the line will be steep with a negative slope
+//    d. For steps 97-128, the line will be shallow with a negative slope
 // 3. On the last event, go back to (0, 0) and repeat
 // Signals:
 // - clk is the clock the update_event is synchronized to
@@ -38,10 +43,34 @@ module line_animator(clk, reset, update_event, x, y, pixel_color);
         .finished(draw_done));
 
     // Define line coordinates
-    assign x0 = step;
-    assign y0 = step;
-    assign x1 = step + 11'd30;
-    assign y1 = step + 11'd20;
+    always_comb begin
+        case (step[7:6]) // Choose two MSB for direction
+            2'b00: begin // !is_steep, positive slope (relative to screen)
+                x0 = step;
+                y0 = step;
+                x1 = step + 11'd30;
+                y1 = step + 11'd10;
+            end
+            2'b01: begin // is_steep, positive slope
+                x0 = step;
+                y0 = step;
+                x1 = step + 11'd10;
+                y1 = step + 11'd30;
+            end
+            2'b10: begin // is_steep, negative slope
+                x0 = step;
+                y0 = step;
+                x1 = step - 11'd10;
+                y1 = step + 11'd30;
+            end
+            2'b11: begin // !is_steep, negative slope
+                x0 = step;
+                y0 = step;
+                x1 = step - 11'd30;
+                y1 = step + 11'd10;
+            end
+        endcase
+    end
 
     // Combinational logic for drawing FSM
     always_comb begin
@@ -131,6 +160,8 @@ module line_animator_testbench();
         for (i=0; i<5; i++) begin
             @(posedge clk);
         end
+        // For the remaining behaviors, it would be more convoluted to test
+        // them via testbench versus testing by inspecting the VGA output.
         $stop;
     end
 endmodule
