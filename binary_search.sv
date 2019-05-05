@@ -362,14 +362,14 @@ module binary_search_dp(
    // Process control signals
    always_ff @(posedge clk) begin
       if (init_regs) begin
-         L = 5'd0;
-         R = 5'd31;
+         L <= 5'd0;
+         R <= 5'd31;
       end
       if (set_found) found <= 1;
       if (set_not_found) found <= 0;
-      if (update_index) I <= (6'(L)+6'(R)) >> 1;
-      if (update_l) L <= ((6'(L)+6'(R)) >> 1) + 1;
-      if (update_r) R <= ((6'(L)+6'(R)) >> 1) - 1;
+      if (update_index) I <= 5'((6'(L)+6'(R)) >> 1);
+      if (update_l) L <= 5'(((6'(L)+6'(R)) >> 1) + 5'b1);
+      if (update_r) R <= 5'(((6'(L)+6'(R)) >> 1) - 5'b1);
       
       // Check invariants
       assert(!(set_found && set_not_found));
