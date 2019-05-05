@@ -21,19 +21,19 @@ module binary_search(
    );
 
    // Status signals
-   logic continue_search, data_out_gt_a, data_out_lt_a;
+   logic l_leq_r, data_out_gt_a, data_out_lt_a, r_eq_min, l_eq_max;
 
    // Control signals
    logic init_regs, set_found, set_not_found, update_index, update_l, update_r;
 
    binary_search_ctrl search_ctrl(
       .clk, .reset, .start,
-      .continue_search, .data_out_gt_a, .data_out_lt_a,
+      .l_leq_r, .data_out_gt_a, .data_out_lt_a, .r_eq_min, .l_eq_max,
       .init_regs, .set_found, .set_not_found, .update_index, .update_l, .update_r);
    binary_search_dp search_dp(
       .clk, .init_regs, .set_found, .set_not_found, .update_index, .update_l, .update_r,
       .ram_out, .A,
-      .continue_search, .data_out_gt_a, .data_out_lt_a, .found, .I);
+      .l_leq_r, .data_out_gt_a, .data_out_lt_a, .r_eq_min, .l_eq_max, .found, .I);
 endmodule
 
 `timescale 1 ps / 1 ps
@@ -42,6 +42,7 @@ module binary_search_testbench();
    logic [7:0] ram_out, A;
    logic found;
    logic [4:0] I;
+   enum {STATE_INIT, STATE_SEARCH, STATE_WAIT1, STATE_WAIT2, STATE_DONE} ps, ns;
 
    binary_search dut(.clk, .reset, .start, .ram_out, .A, .found, .I);
 
@@ -57,18 +58,41 @@ module binary_search_testbench();
 
    int i;
    initial begin
+      // Test random value in middle of RAM
       A <= 8'd41; start <= 1;
       reset <= 1; @(posedge clk);
       reset <= 0; @(posedge clk);
       #(CLOCK_PERIOD*16);
+         assert(found == 1);
+         assert(dut.search_ctrl.ps == STATE_DONE);
       @(posedge clk);
+      // Test out of bounds low value
       start <= 0; @(posedge clk);
       A <= 8'd0; start <= 1; @(posedge clk);
-      #(CLOCK_PERIOD*14);
+      #(CLOCK_PERIOD*16);
+         assert(found == 0);
+         assert(dut.search_ctrl.ps == STATE_DONE);
       @(posedge clk);
+      // Test out of bounds high value
+      start <= 0; @(posedge clk);
+      A <= 8'd64; start <= 1; @(posedge clk);
+      #(CLOCK_PERIOD*20);
+         assert(found == 0);
+         assert(dut.search_ctrl.ps == STATE_DONE);
+      @(posedge clk);
+      // Test value at last address
       start <= 0; @(posedge clk);
       A <= 8'd63; start <= 1; @(posedge clk);
       #(CLOCK_PERIOD*20);
+         assert(found == 1);
+         assert(dut.search_ctrl.ps == STATE_DONE);
+      @(posedge clk);
+      // Test value at first address
+      start <= 0; @(posedge clk);
+      A <= 8'd1; start <= 1; @(posedge clk);
+      #(CLOCK_PERIOD*20);
+         assert(found == 1);
+         assert(dut.search_ctrl.ps == STATE_DONE);
       @(posedge clk);
       $stop;
    end
@@ -78,7 +102,7 @@ endmodule
 //
 // Modular dependencies: N/A
 module binary_search_ctrl(
-      input logic clk, reset, start, continue_search, data_out_lt_a, data_out_gt_a,
+      input logic clk, reset, start, l_leq_r, data_out_lt_a, data_out_gt_a, r_eq_min, l_eq_max,
       output logic init_regs, set_found, set_not_found, update_index, update_l, update_r
    );
 
@@ -106,7 +130,7 @@ module binary_search_ctrl(
          end
          STATE_SEARCH: begin
             update_index = 1;
-            if (continue_search) begin
+            if (l_leq_r) begin
                ns = STATE_WAIT1;
             end
             else begin
@@ -119,12 +143,24 @@ module binary_search_ctrl(
          end
          STATE_WAIT2: begin
             if (data_out_lt_a) begin
-               update_l = 1;
-               ns = STATE_SEARCH;
+               if (l_eq_max) begin
+                  set_not_found = 1;
+                  ns = STATE_DONE;
+               end
+               else begin
+                  update_l = 1;
+                  ns = STATE_SEARCH;
+               end
             end
             else if (data_out_gt_a) begin
-               update_r = 1;
-               ns = STATE_SEARCH;
+               if (r_eq_min) begin
+                  set_not_found = 1;
+                  ns = STATE_DONE;
+               end
+               else begin
+                  update_r = 1;
+                  ns = STATE_SEARCH;
+               end
             end
             else begin
                set_found = 1;
@@ -150,13 +186,13 @@ module binary_search_ctrl(
 endmodule
 
 module binary_search_ctrl_testbench();
-   logic clk, reset, start, continue_search, data_out_lt_a, data_out_gt_a;
+   logic clk, reset, start, l_leq_r, data_out_lt_a, data_out_gt_a, r_eq_min, l_eq_max;
    logic init_regs, set_found, set_not_found, update_index, update_l, update_r;
 
    enum {STATE_INIT, STATE_SEARCH, STATE_WAIT1, STATE_WAIT2, STATE_DONE} ps, ns;
 
    binary_search_ctrl dut(
-      .clk, .reset, .start, .continue_search, .data_out_lt_a, .data_out_gt_a,
+      .clk, .reset, .start, .l_leq_r, .data_out_lt_a, .data_out_gt_a, .r_eq_min, .l_eq_max,
       .init_regs, .set_found, .set_not_found, .update_index, .update_l, .update_r);
 
    // Clock
@@ -167,7 +203,9 @@ module binary_search_ctrl_testbench();
    end
 
    initial begin
-      start <= 0; continue_search <= 0; data_out_lt_a <= 0; data_out_gt_a <= 0;
+      start <= 0; l_leq_r <= 0;
+      data_out_lt_a <= 0; data_out_gt_a <= 0;
+      r_eq_min <= 0; l_eq_max <= 0;
       reset <= 1; @(posedge clk);
       reset <= 0; @(posedge clk);
       // Test start branch
@@ -234,7 +272,7 @@ module binary_search_ctrl_testbench();
          assert(dut.ps == STATE_INIT);
          assert(dut.ns == STATE_SEARCH);
       // Test other branches from SEARCH
-      continue_search <= 1;
+      l_leq_r <= 1;
       @(posedge clk);
          assert(init_regs == 0);
          assert(set_found == 0);
@@ -313,6 +351,47 @@ module binary_search_ctrl_testbench();
          assert(dut.ps == STATE_WAIT2);
          assert(dut.ns == STATE_SEARCH);
       data_out_lt_a <= 0;
+      // Test L == 31 when data_out < A
+      @(posedge clk);
+         assert(init_regs == 0);
+         assert(set_found == 0);
+         assert(set_not_found == 0);
+         assert(update_index == 1);
+         assert(update_l == 0);
+         assert(update_r == 0);
+         assert(dut.ps == STATE_SEARCH);
+         assert(dut.ns == STATE_WAIT1);
+      @(posedge clk);
+         assert(init_regs == 0);
+         assert(set_found == 0);
+         assert(set_not_found == 0);
+         assert(update_index == 0);
+         assert(update_l == 0);
+         assert(update_r == 0);
+         assert(dut.ps == STATE_WAIT1);
+         assert(dut.ns == STATE_WAIT2);
+      data_out_lt_a <= 1; l_eq_max <= 1;
+      @(posedge clk);
+         assert(init_regs == 0);
+         assert(set_found == 0);
+         assert(set_not_found == 1);
+         assert(update_index == 0);
+         assert(update_l == 0);
+         assert(update_r == 0);
+         assert(dut.ps == STATE_WAIT2);
+         assert(dut.ns == STATE_DONE);
+      data_out_lt_a <= 0; l_eq_max <= 0;
+      // Go back to SEARCH
+      reset <= 1; @(posedge clk);
+      reset <= 0; @(posedge clk);
+         assert(init_regs == 1);
+         assert(set_found == 0);
+         assert(set_not_found == 1);
+         assert(update_index == 0);
+         assert(update_l == 0);
+         assert(update_r == 0);
+         assert(dut.ps == STATE_INIT);
+         assert(dut.ns == STATE_SEARCH);
       // Test update_r
       @(posedge clk);
          assert(init_regs == 0);
@@ -342,6 +421,35 @@ module binary_search_ctrl_testbench();
          assert(update_r == 1);
          assert(dut.ps == STATE_WAIT2);
          assert(dut.ns == STATE_SEARCH);
+      // Test R == 0 when data_out > A
+      @(posedge clk);
+         assert(init_regs == 0);
+         assert(set_found == 0);
+         assert(set_not_found == 0);
+         assert(update_index == 1);
+         assert(update_l == 0);
+         assert(update_r == 0);
+         assert(dut.ps == STATE_SEARCH);
+         assert(dut.ns == STATE_WAIT1);
+      @(posedge clk);
+         assert(init_regs == 0);
+         assert(set_found == 0);
+         assert(set_not_found == 0);
+         assert(update_index == 0);
+         assert(update_l == 0);
+         assert(update_r == 0);
+         assert(dut.ps == STATE_WAIT1);
+         assert(dut.ns == STATE_WAIT2);
+      data_out_gt_a <= 1; r_eq_min <= 1;
+      @(posedge clk);
+         assert(init_regs == 0);
+         assert(set_found == 0);
+         assert(set_not_found == 1);
+         assert(update_index == 0);
+         assert(update_l == 0);
+         assert(update_r == 0);
+         assert(dut.ps == STATE_WAIT2);
+         assert(dut.ns == STATE_DONE);
       $stop;
    end
 endmodule
@@ -352,7 +460,7 @@ endmodule
 module binary_search_dp(
       input logic clk, init_regs, set_found, set_not_found, update_index, update_l, update_r,
       input logic [7:0] ram_out, A,
-      output logic continue_search, data_out_lt_a, data_out_gt_a, found,
+      output logic l_leq_r, data_out_lt_a, data_out_gt_a, r_eq_min, l_eq_max, found,
       output logic [4:0] I
    );
 
@@ -377,24 +485,23 @@ module binary_search_dp(
 
    // Output status signals
    always_comb begin
-      // Original algorithm assumes negative values can occur for the case
-      // when R == 0, but this will underflow in our implementation. So, it is
-      // excluded
-      continue_search = L <= R && !(R == 5'd0);
+      l_leq_r = L <= R;
       data_out_lt_a = ram_out < A;
       data_out_gt_a = ram_out > A;
+      r_eq_min = R == 5'd0;
+      l_eq_max = L == 5'd31;
    end
 endmodule
 
 module binary_search_dp_testbench();
    logic clk, init_regs, set_found, set_not_found, update_index, update_l, update_r;
    logic [7:0] ram_out, A;
-   logic continue_search, data_out_lt_a, data_out_gt_a, found;
+   logic l_leq_r, data_out_lt_a, data_out_gt_a, r_eq_min, l_eq_max, found;
    logic [4:0] I;
 
    binary_search_dp dut(
       .clk, .init_regs, .set_found, .set_not_found, .update_index, .update_l, .update_r,
-      .ram_out, .A, .continue_search, .data_out_lt_a, .data_out_gt_a, .found, .I);
+      .ram_out, .A, .l_leq_r, .data_out_lt_a, .data_out_gt_a, .r_eq_min, .l_eq_max, .found, .I);
 
    // Clock
    parameter CLOCK_PERIOD=100;
@@ -447,10 +554,12 @@ module binary_search_dp_testbench();
       update_l <= 0; @(posedge clk);
          assert(dut.L == 30);
          assert(dut.R == 31);
+         assert(l_eq_max == 0);
       update_l <= 1; @(posedge clk);
       update_l <= 0; @(posedge clk);
          assert(dut.L == 31);
          assert(dut.R == 31);
+         assert(l_eq_max == 1);
       update_index <= 1; @(posedge clk);
       update_index <= 0; @(posedge clk);
          assert(I == 31);
@@ -469,12 +578,14 @@ module binary_search_dp_testbench();
       update_r <= 0; @(posedge clk);
          assert(dut.L == 0);
          assert(dut.R == 2);
-         assert(continue_search == 1);
+         assert(l_leq_r == 1);
+         assert(r_eq_min == 0);
       update_r <= 1; @(posedge clk);
       update_r <= 0; @(posedge clk);
          assert(dut.L == 0);
          assert(dut.R == 0);
-         assert(continue_search == 0);
+         assert(l_leq_r == 1);
+         assert(r_eq_min == 1);
       // Test status signals
       A <= 8'd15;
       ram_out <= 8'd7;

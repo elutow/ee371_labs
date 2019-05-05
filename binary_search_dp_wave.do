@@ -9,9 +9,11 @@ add wave -noupdate /binary_search_dp_testbench/update_l
 add wave -noupdate /binary_search_dp_testbench/update_r
 add wave -noupdate /binary_search_dp_testbench/ram_out
 add wave -noupdate /binary_search_dp_testbench/A
-add wave -noupdate /binary_search_dp_testbench/continue_search
+add wave -noupdate /binary_search_dp_testbench/l_leq_r
 add wave -noupdate /binary_search_dp_testbench/data_out_lt_a
 add wave -noupdate /binary_search_dp_testbench/data_out_gt_a
+add wave -noupdate /binary_search_dp_testbench/r_eq_min
+add wave -noupdate /binary_search_dp_testbench/l_eq_max
 add wave -noupdate /binary_search_dp_testbench/found
 add wave -noupdate /binary_search_dp_testbench/I
 TreeUpdate [SetDefaultTree]

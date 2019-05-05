@@ -6,6 +6,8 @@ add wave -noupdate /binary_search_ctrl_testbench/start
 add wave -noupdate /binary_search_ctrl_testbench/l_leq_r
 add wave -noupdate /binary_search_ctrl_testbench/data_out_lt_a
 add wave -noupdate /binary_search_ctrl_testbench/data_out_gt_a
+add wave -noupdate /binary_search_ctrl_testbench/r_eq_min
+add wave -noupdate /binary_search_ctrl_testbench/l_eq_max
 add wave -noupdate /binary_search_ctrl_testbench/init_regs
 add wave -noupdate /binary_search_ctrl_testbench/set_found
 add wave -noupdate /binary_search_ctrl_testbench/set_not_found

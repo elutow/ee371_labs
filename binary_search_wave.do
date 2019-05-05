@@ -7,7 +7,7 @@ add wave -noupdate -radix unsigned /binary_search_testbench/ram_out
 add wave -noupdate -radix unsigned /binary_search_testbench/A
 add wave -noupdate /binary_search_testbench/found
 add wave -noupdate -radix hexadecimal /binary_search_testbench/I
-add wave -noupdate /binary_search_testbench/dut/continue_search
+add wave -noupdate /binary_search_testbench/dut/l_leq_r
 add wave -noupdate /binary_search_testbench/dut/data_out_lt_a
 add wave -noupdate /binary_search_testbench/dut/data_out_gt_a
 add wave -noupdate /binary_search_testbench/dut/search_ctrl/ps
