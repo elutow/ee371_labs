@@ -2,7 +2,9 @@
 // - SW[9] is the start signal
 // - SW[7:0] specifies the value to search for in binary
 // - KEY[0] resets the system, synchronous to the clock
+// - HEX1 and HEX0 indicate the address of the target value if found
 // - LEDR[9] indicates if the desired number was found
+//
 // Modular dependencies:
 // - binary_search
 // - metastability_filter
