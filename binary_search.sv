@@ -1,15 +1,80 @@
-// Controller for binary search implementation
-// I/O is for control and status signals except:
+// Overall implementation of FIFO
 // - clk is the base clock
 // - reset will reset the controller
 // - start indicates whether the binary search should finish. In order to
 //   start a new binary search, start should be toggled to 0 then 1.
+// - ram_out is the output from the RAM module for the given address
+// - Signal A is the value to find in the RAM
+// - Signal I indicates the address of the target value and/or the value
+//   to probe from RAM.
+// - found is 1 when I is an address of the target value A, otherwise it is
+//   zero.
+//
+// Modular dependencies:
+// - binary_search_ctrl
+// - binary_search_dp
+module binary_search(
+      input logic clk, reset, start,
+      input logic [7:0] ram_out, A,
+      output logic found,
+      output logic [4:0] I
+   );
+
+   // Status signals
+   logic continue_search, data_out_gt_a, data_out_lt_a;
+
+   // Control signals
+   logic init_regs, set_found, set_not_found, update_index, update_l, update_r;
+
+   binary_search_ctrl search_ctrl(
+      .clk, .reset, .start,
+      .continue_search, .data_out_gt_a, .data_out_lt_a,
+      .init_regs, .set_found, .set_not_found, .update_index, .update_l, .update_r);
+   binary_search_dp search_dp(
+      .clk, .init_regs, .set_found, .set_not_found, .update_index, .update_l, .update_r,
+      .ram_out, .A,
+      .continue_search, .data_out_gt_a, .data_out_lt_a, .found, .I);
+endmodule
+
+`timescale 1 ps / 1 ps
+module binary_search_testbench();
+   logic clk, reset, start;
+   logic [7:0] ram_out, A;
+   logic found;
+   logic [4:0] I;
+
+   binary_search dut(.clk, .reset, .start, .ram_out, .A, .found, .I);
+
+   // Test with RAM module
+   ram32x8 ram(.address(I), .clock(clk), .data(8'b0), .wren(1'b0), .q(ram_out));
+
+   // Clock
+   parameter CLOCK_PERIOD=100;
+   initial begin
+      clk <= 0;
+      forever #(CLOCK_PERIOD/2) clk <= ~clk;
+   end
+
+   int i;
+   initial begin
+      A <= 8'd41; start <= 1;
+      reset <= 1; @(posedge clk);
+      reset <= 0; @(posedge clk);
+      #(CLOCK_PERIOD*16);
+      @(posedge clk);
+      start <= 0; @(posedge clk);
+      A <= 8'd0; start <= 1; @(posedge clk);
+      #(CLOCK_PERIOD*14);
+      @(posedge clk);
+      $stop;
+   end
+endmodule
+
+// Controller for binary search implementation
 //
 // Modular dependencies: N/A
-module binary_search_ctrl
-   #(parameter WORD_SIZE=4)
-   (
-      input logic clk, reset, start, l_leq_r, data_out_lt_a, data_out_gt_a,
+module binary_search_ctrl(
+      input logic clk, reset, start, continue_search, data_out_lt_a, data_out_gt_a,
       output logic init_regs, set_found, set_not_found, update_index, update_l, update_r
    );
 
@@ -37,7 +102,7 @@ module binary_search_ctrl
          end
          STATE_SEARCH: begin
             update_index = 1;
-            if (l_leq_r) begin
+            if (continue_search) begin
                ns = STATE_WAIT1;
             end
             else begin
@@ -81,13 +146,13 @@ module binary_search_ctrl
 endmodule
 
 module binary_search_ctrl_testbench();
-   logic clk, reset, start, l_leq_r, data_out_lt_a, data_out_gt_a;
+   logic clk, reset, start, continue_search, data_out_lt_a, data_out_gt_a;
    logic init_regs, set_found, set_not_found, update_index, update_l, update_r;
 
    enum {STATE_INIT, STATE_SEARCH, STATE_WAIT1, STATE_WAIT2, STATE_DONE} ps, ns;
 
    binary_search_ctrl dut(
-      .clk, .reset, .start, .l_leq_r, .data_out_lt_a, .data_out_gt_a,
+      .clk, .reset, .start, .continue_search, .data_out_lt_a, .data_out_gt_a,
       .init_regs, .set_found, .set_not_found, .update_index, .update_l, .update_r);
 
    // Clock
@@ -98,7 +163,7 @@ module binary_search_ctrl_testbench();
    end
 
    initial begin
-      start <= 0; l_leq_r <= 0; data_out_lt_a <= 0; data_out_gt_a <= 0;
+      start <= 0; continue_search <= 0; data_out_lt_a <= 0; data_out_gt_a <= 0;
       reset <= 1; @(posedge clk);
       reset <= 0; @(posedge clk);
       // Test start branch
@@ -165,7 +230,7 @@ module binary_search_ctrl_testbench();
          assert(dut.ps == STATE_INIT);
          assert(dut.ns == STATE_SEARCH);
       // Test other branches from SEARCH
-      l_leq_r <= 1;
+      continue_search <= 1;
       @(posedge clk);
          assert(init_regs == 0);
          assert(set_found == 0);
@@ -278,13 +343,12 @@ module binary_search_ctrl_testbench();
 endmodule
 
 // Datapath for binary search implementation
+//
 // Modular dependencies: N/A
-module binary_search_dp
-   #(parameter WORD_SIZE=8)
-   (
+module binary_search_dp(
       input logic clk, init_regs, set_found, set_not_found, update_index, update_l, update_r,
       input logic [7:0] ram_out, A,
-      output logic l_leq_r, data_out_lt_a, data_out_gt_a, found,
+      output logic continue_search, data_out_lt_a, data_out_gt_a, found,
       output logic [4:0] I
    );
 
@@ -299,9 +363,9 @@ module binary_search_dp
       end
       if (set_found) found <= 1;
       if (set_not_found) found <= 0;
-      if (update_index) I <= (L+R) >> 1;
-      if (update_l) L <= ((L+R) >> 1) + 1;
-      if (update_r) R <= ((L+R) >> 1) - 1;
+      if (update_index) I <= (6'(L)+6'(R)) >> 1;
+      if (update_l) L <= ((6'(L)+6'(R)) >> 1) + 1;
+      if (update_r) R <= ((6'(L)+6'(R)) >> 1) - 1;
       
       // Check invariants
       assert(!(set_found && set_not_found));
@@ -309,7 +373,7 @@ module binary_search_dp
 
    // Output status signals
    always_comb begin
-      l_leq_r = L <= R;
+      continue_search = L <= R && !(R == 5'd0);
       data_out_lt_a = ram_out < A;
       data_out_gt_a = ram_out > A;
    end
@@ -318,12 +382,12 @@ endmodule
 module binary_search_dp_testbench();
    logic clk, init_regs, set_found, set_not_found, update_index, update_l, update_r;
    logic [7:0] ram_out, A;
-   logic l_leq_r, data_out_lt_a, data_out_gt_a, found;
+   logic continue_search, data_out_lt_a, data_out_gt_a, found;
    logic [4:0] I;
 
    binary_search_dp dut(
       .clk, .init_regs, .set_found, .set_not_found, .update_index, .update_l, .update_r,
-      .ram_out, .A, .l_leq_r, .data_out_lt_a, .data_out_gt_a, .found, .I);
+      .ram_out, .A, .continue_search, .data_out_lt_a, .data_out_gt_a, .found, .I);
 
    // Clock
    parameter CLOCK_PERIOD=100;
@@ -357,8 +421,54 @@ module binary_search_dp_testbench();
       update_r <= 0; @(posedge clk);
          assert(dut.L == 16);
          assert(dut.R == 22);
+      // Test overflow calculations for L, R, and I
+      init_regs <= 1; @(posedge clk);
+      init_regs <= 0; @(posedge clk);
+      update_l <= 1; @(posedge clk);
+      update_l <= 0; @(posedge clk);
+         assert(dut.L == 16);
+         assert(dut.R == 31);
+      update_l <= 1; @(posedge clk);
+      update_l <= 0; @(posedge clk);
+         assert(dut.L == 24);
+         assert(dut.R == 31);
+      update_l <= 1; @(posedge clk);
+      update_l <= 0; @(posedge clk);
+         assert(dut.L == 28);
+         assert(dut.R == 31);
+      update_l <= 1; @(posedge clk);
+      update_l <= 0; @(posedge clk);
+         assert(dut.L == 30);
+         assert(dut.R == 31);
+      update_l <= 1; @(posedge clk);
+      update_l <= 0; @(posedge clk);
+         assert(dut.L == 31);
+         assert(dut.R == 31);
+      update_index <= 1; @(posedge clk);
+      update_index <= 0; @(posedge clk);
+         assert(I == 31);
+      // Test underflow for R
+      init_regs <= 1; @(posedge clk);
+      init_regs <= 0; @(posedge clk);
+      update_r <= 1; @(posedge clk);
+      update_r <= 0; @(posedge clk);
+         assert(dut.L == 0);
+         assert(dut.R == 14);
+      update_r <= 1; @(posedge clk);
+      update_r <= 0; @(posedge clk);
+         assert(dut.L == 0);
+         assert(dut.R == 6);
+      update_r <= 1; @(posedge clk);
+      update_r <= 0; @(posedge clk);
+         assert(dut.L == 0);
+         assert(dut.R == 2);
+         assert(continue_search == 1);
+      update_r <= 1; @(posedge clk);
+      update_r <= 0; @(posedge clk);
+         assert(dut.L == 0);
+         assert(dut.R == 0);
+         assert(continue_search == 0);
       // Test status signals
-         assert(l_leq_r == 1);
       A <= 8'd15;
       ram_out <= 8'd7;
       @(posedge clk);
