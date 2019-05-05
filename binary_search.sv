@@ -66,6 +66,10 @@ module binary_search_testbench();
       A <= 8'd0; start <= 1; @(posedge clk);
       #(CLOCK_PERIOD*14);
       @(posedge clk);
+      start <= 0; @(posedge clk);
+      A <= 8'd63; start <= 1; @(posedge clk);
+      #(CLOCK_PERIOD*20);
+      @(posedge clk);
       $stop;
    end
 endmodule
@@ -373,6 +377,9 @@ module binary_search_dp(
 
    // Output status signals
    always_comb begin
+      // Original algorithm assumes negative values can occur for the case
+      // when R == 0, but this will underflow in our implementation. So, it is
+      // excluded
       continue_search = L <= R && !(R == 5'd0);
       data_out_lt_a = ram_out < A;
       data_out_gt_a = ram_out > A;
