@@ -11,6 +11,9 @@
 module DE1_SoC (CLOCK_50, CLOCK2_50, KEY, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK, 
 		        AUD_DACLRCK, AUD_ADCLRCK, AUD_BCLK, AUD_ADCDAT, AUD_DACDAT);
 
+	// N-sample average filter size
+	parameter N = 16;
+
 	input CLOCK_50, CLOCK2_50;
 	input [0:0] KEY;
 	// I2C Audio/Video config interface
@@ -38,7 +41,7 @@ module DE1_SoC (CLOCK_50, CLOCK2_50, KEY, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK,
 	assign read = read_ready & write_ready;
 	assign write = read;
 
-	averaging_filter #(.N(8)) fir_filter(
+	averaging_filter #(.N(N)) fir_filter(
 		.clk(CLOCK_50), .reset, .enable(read),
 		.data_in(readdata_left), .data_out(writedata_left));
 	
@@ -98,5 +101,15 @@ module DE1_SoC (CLOCK_50, CLOCK2_50, KEY, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK,
 
 endmodule
 
-// Testbench for DE1_SoC omitted because the custom code is very simple, and
-// testing the audio codec would be difficult
+`timescale 1 ps / 1 ps
+module DE1_SoC_testbench();
+	logic CLOCK_50;
+
+	DE1_SoC dut(.CLOCK_50);
+
+	initial begin
+		CLOCK_50 = 0;
+		// Ensure no asserts have failed
+		#1;
+	end
+endmodule
