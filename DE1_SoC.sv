@@ -1,3 +1,13 @@
+// Top-level module for interfacing with N-sample moving average filter
+// - KEY[0] will reset the system when pressed
+// - The filter reads only from the left channel
+// - The filter outputs the same value to both left and right channels
+//
+// Modular dependencies:
+// - audio_and_video_config
+// - audio_codec
+// - averaging_filter
+// - clock_generator
 module DE1_SoC (CLOCK_50, CLOCK2_50, KEY, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK, 
 		        AUD_DACLRCK, AUD_ADCLRCK, AUD_BCLK, AUD_ADCDAT, AUD_DACDAT);
 
@@ -22,10 +32,15 @@ module DE1_SoC (CLOCK_50, CLOCK2_50, KEY, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK,
 	// Your code goes here 
 	/////////////////////////////////
 	
-	assign writedata_left = readdata_left;
-	assign writedata_right = readdata_right;
+	// Output mono channels
+	assign writedata_right = writedata_left;
+	// RW should occur simultaneously
 	assign read = read_ready & write_ready;
-	assign write = write_ready & write_ready;
+	assign write = read;
+
+	averaging_filter #(.N(8)) fir_filter(
+		.clk(CLOCK_50), .reset, .enable(read),
+		.data_in(readdata_left), .data_out(writedata_left));
 	
 /////////////////////////////////////////////////////////////////////////////////
 // Audio CODEC interface. 
@@ -83,4 +98,5 @@ module DE1_SoC (CLOCK_50, CLOCK2_50, KEY, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK,
 
 endmodule
 
-
+// Testbench for DE1_SoC omitted because the custom code is very simple, and
+// testing the audio codec would be difficult
