@@ -1,4 +1,5 @@
 // This is the FIFO implementation provided with HW 3
+// It has been slightly modified to silence some Quartus warnings
 //
 // Modular dependencies: N/A
 //
@@ -44,8 +45,8 @@ module fifo_ctrl
    always_comb
    begin
       // successive pointer values
-      w_ptr_succ = w_ptr_logic + 1;
-      r_ptr_succ = r_ptr_logic + 1;
+      w_ptr_succ = ADDR_WIDTH'(w_ptr_logic + 1);
+      r_ptr_succ = ADDR_WIDTH'(r_ptr_logic + 1);
       // default: keep old values
       w_ptr_next = w_ptr_logic;
       r_ptr_next = r_ptr_logic;

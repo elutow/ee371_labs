@@ -1,4 +1,6 @@
 // This is the FIFO implementation provided with HW 3
+// It has been slightly modified so that writing can occur when full as long
+// as a simultaneous read occurs
 //
 // Modular dependencies:
 // - fifo_ctrl
@@ -23,8 +25,9 @@ module fifo
    logic wr_en, full_tmp;
 
    // body
-   // write enabled only when FIFO is not full
-   assign wr_en = wr & ~full_tmp;
+   // write enabled only when FIFO is not full, or read and write happens
+   // simultaneously
+   assign wr_en = wr & (~full_tmp | rd);
    assign full = full_tmp;
 
    // instantiate fifo control unit
