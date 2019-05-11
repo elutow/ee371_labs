@@ -26,11 +26,11 @@ program: output_files
 	quartus_pgm -c 'DE-SoC' ProgramTheDE1_SoC.cdf
 
 enable_signaltap: DE1_SoC.stp
-	# Needs DE1_SoC.stp file created manually
 	quartus_stp DE1_SoC --signaltap --stp_file=DE1_SoC.stp --logic_analyzer_interface --enable
+	echo "NOTICE: You will need to open up SignalTap and add the signals"
+	quartus DE1_SoC.qpf
 
 signaltap: output_files DE1_SoC.stp
-	# Needs DE1_SoC.stp file created manually
 	quartus_stpw DE1_SoC.stp
 
 qhelp:

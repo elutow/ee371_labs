@@ -39,3 +39,9 @@ Please make sure that all text files are encoded in UTF-8 with UNIX line endings
 	* Can also run testbenches via ModelSim to check errors faster
 4. `make compile`
 5. Plug in DE1 board. Then: `make program`
+
+## Using SignalTap
+
+1. Enable SignalTap: `make enable_signaltap`
+	* This will open up the Quartus project, where you will need to launch SignalTap manually and add the signals.
+2. To launch SignalTap in the future: `make signaltap`
