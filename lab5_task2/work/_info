@@ -1,0 +1,56 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dD:/Andrew Leung/Undegraduate/UW/Senior Year/Spring 2019/EE 371/Labs/Lab5_test/Task2
+vtask2
+Z1 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
+Z2 !s110 1557941583
+!i10b 1
+!s100 =6Z`mYOUSE6h@PJLXB^P=0
+I`@Cl?YVY_=e08K]:QXkPR2
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+Z4 !s105 task2_sv_unit
+S1
+R0
+Z5 w1557937226
+Z6 8./task2.sv
+Z7 F./task2.sv
+L0 1
+Z8 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z9 !s108 1557941583.000000
+Z10 !s107 ./task2.sv|
+Z11 !s90 -reportprogress|300|./task2.sv|
+!i113 1
+Z12 tCvgOpt 0
+vtask2_testbench
+R1
+R2
+!i10b 1
+!s100 f4__NXWDA2klkLeaog8F]3
+IaYZ2lE^L@THhfaR0hR:2F3
+R3
+R4
+S1
+R0
+R5
+R6
+R7
+L0 28
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+R12
