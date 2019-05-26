@@ -670,6 +670,7 @@ set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "SYSTEMVERILOG HDL" -section_
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name STATE_MACHINE_PROCESSING "USER-ENCODED"
+set_global_assignment -name NUM_PARALLEL_PROCESSORS 4
 set_global_assignment -name SYSTEMVERILOG_FILE DE1_SoC.sv
 set_global_assignment -name SYSTEMVERILOG_FILE VGA_framebuffer.sv
 set_global_assignment -name SYSTEMVERILOG_FILE color_index_to_rgb.sv
