@@ -76,26 +76,30 @@ module VGA_framebuffer(
 
    // Framebuffer memory: 640 x 480 = 307200 bits
 
-   logic [23:0] framebuffer [307199:0] = '{default:'0};
+   logic [7:0] r_framebuffer [307199:0] = '{default:'0};
+   logic [7:0] g_framebuffer [307199:0] = '{default:'0};
+   logic [7:0] b_framebuffer [307199:0] = '{default:'0};
    logic [18:0] read_address, write_address;
 
    assign write_address = x + (y << 9) + (y << 7) ; // x + y * 640
    assign read_address = (hcount >> 1) + (vcount << 9) + (vcount << 7);
 
-   logic [23:0] pixel_read;
-
    always_ff @(posedge clk50) begin
-      if (pixel_write) framebuffer[write_address] <= {r, g, b};
+      if (pixel_write) begin
+         r_framebuffer[write_address] <= r;
+         g_framebuffer[write_address] <= g;
+         b_framebuffer[write_address] <= b;
+      end
       if (hcount[0]) begin
-        pixel_read <= framebuffer[read_address];
-        VGA_BLANK_n <= ~blank; // Keep blank in sync with pixel data
+         VGA_R <= r_framebuffer[read_address];
+         VGA_G <= g_framebuffer[read_address];
+         VGA_B <= b_framebuffer[read_address];
+         VGA_BLANK_n <= ~blank; // Keep blank in sync with pixel data
       end
    end
 
    assign VGA_CLK = hcount[0]; // 25 MHz clock: pixel latched on rising edge
 
-   assign {VGA_R, VGA_G, VGA_B} = pixel_read;
-
 endmodule
 
-// vim: set expandtab shiftwidth=4 softtabstop=4:
+// vim: set expandtab shiftwidth=3 softtabstop=3:
