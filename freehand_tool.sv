@@ -38,27 +38,27 @@ module freehand_tool
                     0: begin
                         next_x = pixel_x;
                         next_y = pixel_y;
-                        next_step = 1;
+                        next_step = 'd1;
                     end
                     1: begin
-                        next_x = pixel_x + 1;
+                        next_x = pixel_x + 'd1;
                         next_y = pixel_y;
-                        next_step = 2;
+                        next_step = 'd2;
                     end
                     2: begin
                         next_x = pixel_x;
-                        next_y = pixel_y + 1;
-                        next_step = 3;
+                        next_y = pixel_y + 'd1;
+                        next_step = 'd3;
                     end
                     3: begin
-                        next_x = pixel_x - 1;
+                        next_x = pixel_x - 'd1;
                         next_y = pixel_y;
-                        next_step = 4;
+                        next_step = 'd4;
                     end
                     4: begin
                         next_x = pixel_x;
-                        next_y = pixel_y - 1;
-                        next_step = 5;
+                        next_y = pixel_y - 'd1;
+                        next_step = 'd5;
                     end
                     5: begin
                         next_x = pixel_x;
