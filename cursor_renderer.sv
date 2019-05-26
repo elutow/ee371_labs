@@ -9,7 +9,7 @@ module cursor_renderer
         input logic [$clog2(WIDTH)-1:0] cursor_x,
         input logic [$clog2(HEIGHT)-1:0] cursor_y,
         input logic [COLOR_WIDTH-1:0] current_color,
-        output logic [COLOR_WIDTH-1:0] cursor_frame [$clog2(WIDTH)-1:0][$clog2(HEIGHT)-1:0] = '{default:COLOR_NONE}
+        output logic [COLOR_WIDTH-1:0] cursor_frame [WIDTH-1:0][HEIGHT-1:0] = '{default:COLOR_NONE}
     );
 
     logic [$clog2(WIDTH)-1:0] x, next_x;
@@ -150,7 +150,7 @@ module cursor_renderer_testbench();
     logic [$clog2(WIDTH)-1:0] cursor_x;
     logic [$clog2(HEIGHT)-1:0] cursor_y;
     logic [COLOR_WIDTH-1:0] current_color;
-    logic [COLOR_WIDTH-1:0] cursor_frame [$clog2(WIDTH)-1:0][$clog2(HEIGHT)-1:0];
+    logic [COLOR_WIDTH-1:0] cursor_frame [WIDTH-1:0][HEIGHT-1:0];
 
     cursor_renderer #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) dut(
         .clk, .reset, .cursor_x, .cursor_y, .current_color, .cursor_frame);

@@ -10,7 +10,7 @@ module drawing_canvas
         input logic [$clog2(WIDTH)-1:0] x,
         input logic [$clog2(HEIGHT)-1:0] y,
         input logic [COLOR_WIDTH-1:0] color,
-        output logic [COLOR_WIDTH-1:0] frame [$clog2(WIDTH)-1:0][$clog2(HEIGHT)-1:0] = '{default:COLOR_NONE}
+        output logic [COLOR_WIDTH-1:0] frame [WIDTH-1:0][HEIGHT-1:0] = '{default:COLOR_NONE}
     );
 
     always_ff @(posedge clk) begin
@@ -24,7 +24,7 @@ module drawing_canvas_testbench();
     logic [$clog2(WIDTH)-1:0] x;
     logic [$clog2(HEIGHT)-1:0] y;
     logic [COLOR_WIDTH-1:0] color;
-    logic [COLOR_WIDTH-1:0] frame [$clog2(WIDTH)-1:0][$clog2(HEIGHT)-1:0];
+    logic [COLOR_WIDTH-1:0] frame [WIDTH-1:0][HEIGHT-1:0];
 
     drawing_canvas #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) dut(
         .clk, .enable, .x, .y, .color, .frame);

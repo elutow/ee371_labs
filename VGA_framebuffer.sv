@@ -8,7 +8,7 @@ module VGA_framebuffer(
  input logic        clk50, reset,
  input logic [10:0] x, y, // Pixel coordinates
  input logic [7:0] r, g, b, // Pixel color
- input logic        pixel_color, pixel_write,
+ input logic        pixel_write,
 
  output logic [7:0] VGA_R, VGA_G, VGA_B,
  output logic       VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n);
