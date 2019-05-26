@@ -54,10 +54,6 @@ module DE1_SoC
         .clk(CLOCK_50), .reset, .direct_in(SW[1]), .filtered_out(canvas1_visible));
     metastability_filter frame2_visible_filter(
         .clk(CLOCK_50), .reset, .direct_in(SW[2]), .filtered_out(canvas2_visible));
-    metastability_filter frame3_visible_filter(
-        .clk(CLOCK_50), .reset, .direct_in(SW[3]), .filtered_out(canvas3_visible));
-    metastability_filter frame4_visible_filter(
-        .clk(CLOCK_50), .reset, .direct_in(SW[4]), .filtered_out(canvas4_visible));
 
     // Cursor logic attachments
     color_selector select_color(
@@ -80,14 +76,10 @@ module DE1_SoC
         .clk(CLOCK_50), .enable(current_layer == 2 && canvas2_visible),
         .tool_x, .tool_y, .tool_color,
         .pixel_x(request_x), .pixel_y(request_y), .pixel_color(canvas2_color));
-    drawing_canvas #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) canvas3(
-        .clk(CLOCK_50), .enable(current_layer == 3 && canvas3_visible),
-        .tool_x, .tool_y, .tool_color,
-        .pixel_x(request_x), .pixel_y(request_y), .pixel_color(canvas3_color));
-    drawing_canvas #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) canvas4(
-        .clk(CLOCK_50), .enable(current_layer == 4 && canvas4_visible),
-        .tool_x, .tool_y, .tool_color,
-        .pixel_x(request_x), .pixel_y(request_y), .pixel_color(canvas4_color));
+    assign canvas3_color = COLOR_NONE;
+    assign canvas3_visible = 0;
+    assign canvas4_color = COLOR_NONE;
+    assign canvas4_visible = 0;
 
     // Drawing I/O to VGA I/O
     compositor #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) composer(
