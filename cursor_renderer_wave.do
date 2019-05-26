@@ -5,9 +5,12 @@ add wave -noupdate /cursor_renderer_testbench/reset
 add wave -radix unsigned -noupdate /cursor_renderer_testbench/cursor_x
 add wave -radix unsigned -noupdate /cursor_renderer_testbench/cursor_y
 add wave -noupdate /cursor_renderer_testbench/current_color
-add wave -radix unsigned -noupdate /cursor_renderer_testbench/cursor_frame
+add wave -radix unsigned -noupdate /cursor_renderer_testbench/request_x
+add wave -radix unsigned -noupdate /cursor_renderer_testbench/request_y
+add wave -radix unsigned -noupdate /cursor_renderer_testbench/render_color
 add wave -noupdate /cursor_renderer_testbench/dut/ps
 add wave -noupdate /cursor_renderer_testbench/dut/ns
+add wave -radix unsigned -noupdate /cursor_renderer_testbench/dut/cursor_frame
 add wave -radix unsigned -noupdate /cursor_renderer_testbench/dut/step
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {223 ps} 0}

@@ -22,87 +22,103 @@ module DE1_SoC
     output VGA_VS;
 
     // Inter-module signals
-    logic [COLOR_WIDTH-1:0] current_color, rendered_color;
+    logic [COLOR_WIDTH-1:0] current_color, render_color;
     logic [2:0] current_layer;
     // VGA I/O
     logic [$clog2(WIDTH)-1:0] vga_x;
     logic [$clog2(HEIGHT)-1:0] vga_y;
     logic [7:0] vga_r, vga_g, vga_b;
-    // Cursor I/O
+    // Compositor I/O
+    logic [$clog2(WIDTH)-1:0] request_x;
+    logic [$clog2(HEIGHT)-1:0] request_y;
+    // Cursor renderer I/O
     logic cursor_left, cursor_middle, cursor_right;
     logic [$clog2(WIDTH)-1:0] cursor_x;
     logic [$clog2(HEIGHT)-1:0] cursor_y;
-    logic [COLOR_WIDTH-1:0] cursor_frame [WIDTH-1:0][HEIGHT-1:0];
+    logic [COLOR_WIDTH-1:0] cursor_color;
     // Freehand tool I/O
     logic [$clog2(WIDTH)-1:0] tool_x;
     logic [$clog2(HEIGHT)-1:0] tool_y;
     logic [COLOR_WIDTH-1:0] tool_color;
     // Drawing canvas I/O
-    logic [COLOR_WIDTH-1:0] draw_frame1 [WIDTH-1:0][HEIGHT-1:0];
-    logic [COLOR_WIDTH-1:0] draw_frame2 [WIDTH-1:0][HEIGHT-1:0];
-    logic [COLOR_WIDTH-1:0] draw_frame3 [WIDTH-1:0][HEIGHT-1:0];
-    logic [COLOR_WIDTH-1:0] draw_frame4 [WIDTH-1:0][HEIGHT-1:0];
+    logic [COLOR_WIDTH-1:0] canvas1_color, canvas2_color, canvas3_color, canvas4_color;
 
     // Filtered signals
     logic reset;
-    logic frame1_visible, frame2_visible, frame3_visible, frame4_visible;
+    logic canvas1_visible, canvas2_visible, canvas3_visible, canvas4_visible;
     logic cursor_visible;
 
+    // Metastability filters
     metastability_filter reset_filter(
         .clk(CLOCK_50), .reset(1'b0), .direct_in(~KEY[2]), .filtered_out(reset));
     metastability_filter cursor_visible_filter(
         .clk(CLOCK_50), .reset, .direct_in(SW[0]), .filtered_out(cursor_visible));
     metastability_filter frame1_visible_filter(
-        .clk(CLOCK_50), .reset, .direct_in(SW[1]), .filtered_out(frame1_visible));
+        .clk(CLOCK_50), .reset, .direct_in(SW[1]), .filtered_out(canvas1_visible));
     metastability_filter frame2_visible_filter(
-        .clk(CLOCK_50), .reset, .direct_in(SW[2]), .filtered_out(frame2_visible));
+        .clk(CLOCK_50), .reset, .direct_in(SW[2]), .filtered_out(canvas2_visible));
     metastability_filter frame3_visible_filter(
-        .clk(CLOCK_50), .reset, .direct_in(SW[3]), .filtered_out(frame3_visible));
+        .clk(CLOCK_50), .reset, .direct_in(SW[3]), .filtered_out(canvas3_visible));
     metastability_filter frame4_visible_filter(
-        .clk(CLOCK_50), .reset, .direct_in(SW[4]), .filtered_out(frame4_visible));
+        .clk(CLOCK_50), .reset, .direct_in(SW[4]), .filtered_out(canvas4_visible));
 
-    ps2 #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) ps2_mouse(
-        .CLOCK_50, .start(reset), .reset, .PS2_CLK, .PS2_DAT,
-        .button_left(cursor_left), .button_middle(cursor_middle), .button_right(cursor_right),
-        .bin_x(cursor_x), .bin_y(cursor_y));
+    // Cursor logic attachments
     color_selector select_color(
         .clk(CLOCK_50), .reset, .toggle(cursor_right), .color(current_color));
     layer_selector select_layer(
         .clk(CLOCK_50), .reset, .toggle(cursor_middle), .layer(current_layer));
-    seg7 layer_display(
-        .hex({1'b0, current_layer}), .out(HEX0));
-    cursor_renderer #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) cursor_drawer(
-        .clk(CLOCK_50), .reset, .cursor_x, .cursor_y, .current_color, .cursor_frame);
     freehand_tool #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) tool_freehand(
         .clk(CLOCK_50), .reset, .enable(cursor_left), .cursor_x, .cursor_y, .input_color(current_color),
         .pixel_x(tool_x), .pixel_y(tool_y), .pixel_color(tool_color));
+    cursor_renderer #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) cursor_drawer(
+        .clk(CLOCK_50), .reset, .cursor_x, .cursor_y, .current_color,
+        .request_x, .request_y, .render_color(cursor_color));
+
+    // Drawing canvases
     drawing_canvas #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) canvas1(
-        .clk(CLOCK_50), .enable(current_layer == 1 && frame1_visible),
-        .x(tool_x), .y(tool_y), .color(tool_color), .frame(draw_frame1));
+        .clk(CLOCK_50), .enable(current_layer == 1 && canvas1_visible),
+        .tool_x, .tool_y, .tool_color,
+        .pixel_x(request_x), .pixel_y(request_y), .pixel_color(canvas1_color));
     drawing_canvas #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) canvas2(
-        .clk(CLOCK_50), .enable(current_layer == 2 && frame2_visible),
-        .x(tool_x), .y(tool_y), .color(tool_color), .frame(draw_frame2));
+        .clk(CLOCK_50), .enable(current_layer == 2 && canvas2_visible),
+        .tool_x, .tool_y, .tool_color,
+        .pixel_x(request_x), .pixel_y(request_y), .pixel_color(canvas2_color));
     drawing_canvas #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) canvas3(
-        .clk(CLOCK_50), .enable(current_layer == 3 && frame3_visible),
-        .x(tool_x), .y(tool_y), .color(tool_color), .frame(draw_frame3));
+        .clk(CLOCK_50), .enable(current_layer == 3 && canvas3_visible),
+        .tool_x, .tool_y, .tool_color,
+        .pixel_x(request_x), .pixel_y(request_y), .pixel_color(canvas3_color));
     drawing_canvas #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) canvas4(
-        .clk(CLOCK_50), .enable(current_layer == 4 && frame4_visible),
-        .x(tool_x), .y(tool_y), .color(tool_color), .frame(draw_frame4));
+        .clk(CLOCK_50), .enable(current_layer == 4 && canvas4_visible),
+        .tool_x, .tool_y, .tool_color,
+        .pixel_x(request_x), .pixel_y(request_y), .pixel_color(canvas4_color));
+
+    // Drawing I/O to VGA I/O
     compositor #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) composer(
-        .clk(CLOCK_50), .reset, .camera_frame('{default:COLOR_BLACK}), .cursor_frame,
-        .cursor_frame_visible(cursor_visible),
-        .draw_frame1, .draw_frame1_visible(frame1_visible),
-        .draw_frame2, .draw_frame2_visible(frame2_visible),
-        .draw_frame3, .draw_frame3_visible(frame3_visible),
-        .draw_frame4, .draw_frame4_visible(frame4_visible),
-        .x(vga_x), .y(vga_y), .pixel_color(rendered_color));
+        .clk(CLOCK_50), .reset, .camera_color(COLOR_BLACK), .cursor_color,
+        .cursor_visible,
+        .canvas1_color, .canvas1_visible,
+        .canvas2_color, .canvas2_visible,
+        .canvas3_color, .canvas3_visible,
+        .canvas4_color, .canvas4_visible,
+        .request_x, .request_y,
+        .render_x(vga_x), .render_y(vga_y), .render_color);
     color_index_to_rgb index_to_rgb(
-        .index(rendered_color), .r(vga_r), .g(vga_g), .b(vga_b));
+        .index(render_color), .r(vga_r), .g(vga_g), .b(vga_b));
+
+    // Peripheral attachments
+    ps2 #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) ps2_mouse(
+        .CLOCK_50, .start(reset), .reset, .PS2_CLK, .PS2_DAT,
+        .button_left(cursor_left), .button_middle(cursor_middle), .button_right(cursor_right),
+        .bin_x(cursor_x), .bin_y(cursor_y));
     VGA_framebuffer fb(
         .clk50(CLOCK_50), .reset, .x({1'b0, vga_x}), .y({2'b0, vga_y}),
         .r(vga_r), .g(vga_g), .b(vga_b), .pixel_write(1'b1),
         .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
         .VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
+
+    // Misc board I/O attachments
+    seg7 layer_display(
+        .hex({1'b0, current_layer}), .out(HEX0));
 endmodule
 
 module DE1_SoC_testbench();

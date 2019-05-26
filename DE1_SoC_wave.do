@@ -20,15 +20,17 @@ add wave -noupdate /DE1_SoC_testbench/VGA_CLK
 add wave -noupdate /DE1_SoC_testbench/VGA_HS
 add wave -noupdate /DE1_SoC_testbench/VGA_SYNC_N
 add wave -noupdate /DE1_SoC_testbench/VGA_VS
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/cursor_frame
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/draw_frame4
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/draw_frame3
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/draw_frame2
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/draw_frame1
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/composer/camera_frame
+add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/request_x
+add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/request_y
+add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/cursor_color
+add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas4_color
+add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas3_color
+add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas2_color
+add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas1_color
+add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/composer/camera_color
 add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/vga_x
 add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/vga_y
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/rendered_color
+add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/render_color
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {223 ps} 0}
 quietly wave cursor active 1

@@ -2,10 +2,13 @@ onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate /drawing_canvas_testbench/clk
 add wave -noupdate /drawing_canvas_testbench/enable
-add wave -radix unsigned -noupdate /drawing_canvas_testbench/x
-add wave -radix unsigned -noupdate /drawing_canvas_testbench/y
-add wave -radix unsigned -noupdate /drawing_canvas_testbench/color
-add wave -radix unsigned -noupdate /drawing_canvas_testbench/frame
+add wave -radix unsigned -noupdate /drawing_canvas_testbench/tool_x
+add wave -radix unsigned -noupdate /drawing_canvas_testbench/tool_y
+add wave -radix unsigned -noupdate /drawing_canvas_testbench/tool_color
+add wave -radix unsigned -noupdate /drawing_canvas_testbench/pixel_x
+add wave -radix unsigned -noupdate /drawing_canvas_testbench/pixel_y
+add wave -radix unsigned -noupdate /drawing_canvas_testbench/pixel_color
+add wave -radix unsigned -noupdate /drawing_canvas_testbench/dut/frame
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {223 ps} 0}
 quietly wave cursor active 1

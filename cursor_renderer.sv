@@ -9,8 +9,11 @@ module cursor_renderer
         input logic [$clog2(WIDTH)-1:0] cursor_x,
         input logic [$clog2(HEIGHT)-1:0] cursor_y,
         input logic [COLOR_WIDTH-1:0] current_color,
-        output logic [COLOR_WIDTH-1:0] cursor_frame [WIDTH-1:0][HEIGHT-1:0] = '{default:COLOR_NONE}
+        input logic [$clog2(WIDTH)-1:0] request_x,
+        input logic [$clog2(HEIGHT)-1:0] request_y,
+        output logic [COLOR_WIDTH-1:0] render_color 
     );
+    logic [COLOR_WIDTH-1:0] cursor_frame [WIDTH-1:0][HEIGHT-1:0] = '{default:COLOR_NONE};
 
     logic [$clog2(WIDTH)-1:0] x, next_x;
     logic [$clog2(HEIGHT)-1:0] y, next_y;
@@ -141,6 +144,7 @@ module cursor_renderer
             step <= next_step;
         end
         cursor_frame[x][y] <= color;
+        render_color <= cursor_frame[request_x][request_y];
     end
 endmodule
 
@@ -150,10 +154,13 @@ module cursor_renderer_testbench();
     logic [$clog2(WIDTH)-1:0] cursor_x;
     logic [$clog2(HEIGHT)-1:0] cursor_y;
     logic [COLOR_WIDTH-1:0] current_color;
-    logic [COLOR_WIDTH-1:0] cursor_frame [WIDTH-1:0][HEIGHT-1:0];
+    logic [$clog2(WIDTH)-1:0] request_x;
+    logic [$clog2(HEIGHT)-1:0] request_y;
+    logic [COLOR_WIDTH-1:0] render_color;
 
     cursor_renderer #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) dut(
-        .clk, .reset, .cursor_x, .cursor_y, .current_color, .cursor_frame);
+        .clk, .reset, .cursor_x, .cursor_y, .current_color,
+        .request_x, .request_y, .render_color);
 
     // Clock
     parameter CLOCK_PERIOD=100;
@@ -165,6 +172,7 @@ module cursor_renderer_testbench();
     int i;
     initial begin
         cursor_x <= 0; cursor_y <= 0; current_color <= COLOR_BLUE;
+        request_x <= 1; request_y <= 1;
         reset <= 1; @(posedge clk);
         reset <= 0; @(posedge clk);
         // Test drawing in one location
@@ -172,10 +180,10 @@ module cursor_renderer_testbench();
             @(posedge clk);
         end
         assert(
-            cursor_frame[0][0] == COLOR_BLUE
-            && cursor_frame[0][1] == COLOR_BLUE
-            && cursor_frame[1][0] == COLOR_BLUE
-            && cursor_frame[1][1] == COLOR_BLUE
+            dut.cursor_frame[0][0] == COLOR_BLUE
+            && dut.cursor_frame[0][1] == COLOR_BLUE
+            && dut.cursor_frame[1][0] == COLOR_BLUE
+            && dut.cursor_frame[1][1] == COLOR_BLUE
         );
         cursor_x <= 1; cursor_y <= 1; @(posedge clk);
         for (i=0; i<15; i++) begin
@@ -183,13 +191,13 @@ module cursor_renderer_testbench();
         end
         // Test erasing and drawing in new location
         assert(
-            cursor_frame[0][0] == COLOR_NONE
-            && cursor_frame[0][1] == COLOR_NONE
-            && cursor_frame[1][0] == COLOR_NONE
-            && cursor_frame[1][1] == COLOR_BLUE
-            && cursor_frame[1][2] == COLOR_BLUE
-            && cursor_frame[2][1] == COLOR_BLUE
-            && cursor_frame[2][2] == COLOR_BLUE
+            dut.cursor_frame[0][0] == COLOR_NONE
+            && dut.cursor_frame[0][1] == COLOR_NONE
+            && dut.cursor_frame[1][0] == COLOR_NONE
+            && dut.cursor_frame[1][1] == COLOR_BLUE
+            && dut.cursor_frame[1][2] == COLOR_BLUE
+            && dut.cursor_frame[2][1] == COLOR_BLUE
+            && dut.cursor_frame[2][2] == COLOR_BLUE
         );
         $stop;
     end
