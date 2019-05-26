@@ -11,7 +11,7 @@ module DE1_SoC
     input logic [9:0] SW;
 
     input CLOCK_50;
-    input PS2_CLK, PS2_DAT;
+    inout PS2_CLK, PS2_DAT;
     output [7:0] VGA_R;
     output [7:0] VGA_G;
     output [7:0] VGA_B;
