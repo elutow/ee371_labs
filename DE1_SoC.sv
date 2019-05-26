@@ -25,10 +25,7 @@ module DE1_SoC
     logic [COLOR_WIDTH-1:0] current_color, render_color;
     logic [2:0] current_layer;
     // VGA I/O
-    logic [$clog2(WIDTH)-1:0] vga_x;
-    logic [$clog2(HEIGHT)-1:0] vga_y;
     logic [7:0] vga_r, vga_g, vga_b;
-    // Compositor I/O
     logic [$clog2(WIDTH)-1:0] request_x;
     logic [$clog2(HEIGHT)-1:0] request_y;
     // Cursor renderer I/O
@@ -94,14 +91,12 @@ module DE1_SoC
 
     // Drawing I/O to VGA I/O
     compositor #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) composer(
-        .clk(CLOCK_50), .reset, .camera_color(COLOR_BLACK), .cursor_color,
-        .cursor_visible,
+        .camera_color(COLOR_BLACK), .cursor_color, .cursor_visible,
         .canvas1_color, .canvas1_visible,
         .canvas2_color, .canvas2_visible,
         .canvas3_color, .canvas3_visible,
         .canvas4_color, .canvas4_visible,
-        .request_x, .request_y,
-        .render_x(vga_x), .render_y(vga_y), .render_color);
+        .render_color);
     color_index_to_rgb index_to_rgb(
         .index(render_color), .r(vga_r), .g(vga_g), .b(vga_b));
 
@@ -110,8 +105,11 @@ module DE1_SoC
         .CLOCK_50, .start(reset), .reset, .PS2_CLK, .PS2_DAT,
         .button_left(cursor_left), .button_middle(cursor_middle), .button_right(cursor_right),
         .bin_x(cursor_x), .bin_y(cursor_y));
-    VGA_framebuffer fb(
-        .clk50(CLOCK_50), .reset, .x({1'b0, vga_x}), .y({2'b0, vga_y}),
+    // NOTE: VGA driver is hardcoded to 640x480. It will not function
+    // correctly at other resolutions! (But for the sake of testbenching, it
+    // will run)
+    VGA_framebuffer #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) fb(
+        .clk50(CLOCK_50), .reset, .request_x, .request_y,
         .r(vga_r), .g(vga_g), .b(vga_b), .pixel_write(1'b1),
         .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
         .VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
@@ -128,7 +126,7 @@ module DE1_SoC_testbench();
     logic [9:0] SW;
 
     logic CLOCK_50;
-    logic PS2_CLK, PS2_DAT;
+    wire PS2_CLK, PS2_DAT;
     logic [7:0] VGA_R;
     logic [7:0] VGA_G;
     logic [7:0] VGA_B;

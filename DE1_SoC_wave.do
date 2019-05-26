@@ -28,8 +28,6 @@ add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas3_color
 add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas2_color
 add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas1_color
 add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/composer/camera_color
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/vga_x
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/vga_y
 add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/render_color
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {223 ps} 0}

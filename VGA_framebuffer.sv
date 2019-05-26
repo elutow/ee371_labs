@@ -4,12 +4,15 @@
  * Stephen A. Edwards, Columbia University
  */
 
-module VGA_framebuffer(
+module VGA_framebuffer
+#(parameter WIDTH=640, HEIGHT=480) // NOTE: VGA driver is currently hardcoded to 640x480
+(
  input logic        clk50, reset,
- input logic [10:0] x, y, // Pixel coordinates
  input logic [7:0] r, g, b, // Pixel color
  input logic        pixel_write,
 
+ output logic [$clog2(WIDTH)-1:0] request_x,
+ output logic [$clog2(HEIGHT)-1:0] request_y,
  output logic [7:0] VGA_R, VGA_G, VGA_B,
  output logic       VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_n, VGA_SYNC_n);
 
@@ -41,7 +44,7 @@ module VGA_framebuffer(
    logic [10:0] hcount; // Horizontal counter
    logic endOfLine;
 
-   always_ff @(posedge clk50 or posedge reset)
+   always_ff @(posedge clk50)
      if (reset)          hcount <= 0;
      else if (endOfLine) hcount <= 0;
      else                hcount <= hcount + 11'd 1;
@@ -52,7 +55,7 @@ module VGA_framebuffer(
    logic [9:0] vcount;
    logic endOfField;
 
-   always_ff @(posedge clk50 or posedge reset)
+   always_ff @(posedge clk50)
      if (reset)          vcount <= 0;
      else if (endOfLine)
        if (endOfField)   vcount <= 0;
@@ -74,26 +77,14 @@ module VGA_framebuffer(
    assign blank = ( hcount[10] & (hcount[9] | hcount[8]) ) |
           ( vcount[9] | (vcount[8:5] == 4'b1111) );
 
-   // Framebuffer memory: 640 x 480 = 307200 bits
-
-   logic [7:0] r_framebuffer [307199:0] = '{default:'0};
-   logic [7:0] g_framebuffer [307199:0] = '{default:'0};
-   logic [7:0] b_framebuffer [307199:0] = '{default:'0};
-   logic [18:0] read_address, write_address;
-
-   assign write_address = x + (y << 9) + (y << 7) ; // x + y * 640
-   assign read_address = (hcount >> 1) + (vcount << 9) + (vcount << 7);
+   assign request_x = hcount >= WIDTH ? $clog2(WIDTH)'(639) : hcount[$clog2(WIDTH)-1:0];
+   assign request_y = vcount >= HEIGHT ? $clog2(HEIGHT)'(479) : vcount[$clog2(HEIGHT)-1:0];
 
    always_ff @(posedge clk50) begin
-      if (pixel_write) begin
-         r_framebuffer[write_address] <= r;
-         g_framebuffer[write_address] <= g;
-         b_framebuffer[write_address] <= b;
-      end
       if (hcount[0]) begin
-         VGA_R <= r_framebuffer[read_address];
-         VGA_G <= g_framebuffer[read_address];
-         VGA_B <= b_framebuffer[read_address];
+         VGA_R <= r;
+         VGA_G <= g;
+         VGA_B <= b;
          VGA_BLANK_n <= ~blank; // Keep blank in sync with pixel data
       end
    end
