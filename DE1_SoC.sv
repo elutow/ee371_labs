@@ -22,7 +22,7 @@ module DE1_SoC
     output VGA_VS;
 
     // Inter-module signals
-    logic [COLOR_WIDTH-1:0] current_color, render_color;
+    logic [COLOR_WIDTH-1:0] current_color;
     logic [2:0] current_layer;
     // VGA I/O
     logic [7:0] vga_r, vga_g, vga_b;
@@ -44,10 +44,13 @@ module DE1_SoC
     logic reset;
     logic canvas1_visible, canvas2_visible, canvas3_visible, canvas4_visible;
     logic cursor_visible;
+    logic ps2_start;
 
     // Metastability filters
     metastability_filter reset_filter(
         .clk(CLOCK_50), .reset(1'b0), .direct_in(~KEY[2]), .filtered_out(reset));
+    metastability_filter ps2_start_filter(
+        .clk(CLOCK_50), .reset, .direct_in(~KEY[1]), .filtered_out(ps2_start));
     metastability_filter cursor_visible_filter(
         .clk(CLOCK_50), .reset, .direct_in(SW[0]), .filtered_out(cursor_visible));
     metastability_filter frame1_visible_filter(
@@ -83,18 +86,17 @@ module DE1_SoC
 
     // Drawing I/O to VGA I/O
     compositor #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) composer(
-        .camera_color(COLOR_BLACK), .cursor_color, .cursor_visible,
+        .camera_r(8'h11), .camera_g(8'h11), .camera_b(8'h11),
+        .cursor_color, .cursor_visible,
         .canvas1_color, .canvas1_visible,
         .canvas2_color, .canvas2_visible,
         .canvas3_color, .canvas3_visible,
         .canvas4_color, .canvas4_visible,
-        .render_color);
-    color_index_to_rgb index_to_rgb(
-        .index(render_color), .r(vga_r), .g(vga_g), .b(vga_b));
+        .render_r(vga_r), .render_g(vga_g), .render_b(vga_b));
 
     // Peripheral attachments
     ps2 #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) ps2_mouse(
-        .CLOCK_50, .start(reset), .reset, .PS2_CLK, .PS2_DAT,
+        .CLOCK_50, .start(ps2_start), .reset, .PS2_CLK, .PS2_DAT,
         .button_left(cursor_left), .button_middle(cursor_middle), .button_right(cursor_right),
         .bin_x(cursor_x), .bin_y(cursor_y));
     // NOTE: VGA driver is hardcoded to 640x480. It will not function
@@ -143,6 +145,8 @@ module DE1_SoC_testbench();
     initial begin
         KEY[2] <= 0; @(posedge CLOCK_50);
         KEY[2] <= 1; @(posedge CLOCK_50);
+        KEY[1] <= 0; @(posedge CLOCK_50);
+        KEY[1] <= 1; @(posedge CLOCK_50);
         for (i=0; i<20; i++) begin
             @(posedge CLOCK_50);
         end

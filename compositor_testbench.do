@@ -4,8 +4,9 @@ vlib work
 # Compile Verilog
 #     All Verilog files that are part of this design should have
 #     their own "vlog" line below.
-vlog "compositor.sv"
+vlog "color_index_to_rgb.sv"
 vlog "common.sv"
+vlog "compositor.sv"
 
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the

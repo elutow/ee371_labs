@@ -5,9 +5,7 @@
 module compositor
     #(parameter WIDTH=640, HEIGHT=480)
     (
-        // TODO: Change to correct type for camera_color to accomodate camera
-        // driver
-        input logic [COLOR_WIDTH-1:0] camera_color,
+        input logic [7:0] camera_r, camera_g, camera_b,
         input logic [COLOR_WIDTH-1:0] cursor_color,
         input logic cursor_visible,
         input logic [COLOR_WIDTH-1:0] canvas1_color,
@@ -18,24 +16,39 @@ module compositor
         input logic canvas3_visible,
         input logic [COLOR_WIDTH-1:0] canvas4_color,
         input logic canvas4_visible,
-        output logic [COLOR_WIDTH-1:0] render_color
+        output logic [7:0] render_r, render_g, render_b
     );
+
+    // Composed color other than the camera layer
+    logic [COLOR_WIDTH-1:0] other_color;
+    logic [7:0] other_r, other_g, other_b;
+
+    color_index_to_rgb index_to_rgb(
+        .index(other_color), .r(other_r), .g(other_g), .b(other_b));
 
     // Determine pixel color for location
     always_comb begin
-        if (cursor_visible && cursor_color != COLOR_NONE) render_color = cursor_color;
-        else if (canvas4_visible && canvas4_color != COLOR_NONE) render_color = canvas4_color;
-        else if (canvas3_visible && canvas3_color != COLOR_NONE) render_color = canvas3_color;
-        else if (canvas2_visible && canvas2_color != COLOR_NONE) render_color = canvas2_color;
-        else if (canvas1_visible && canvas1_color != COLOR_NONE) render_color = canvas1_color;
-        else render_color = camera_color;
+        render_r = other_r;
+        render_g = other_g;
+        render_b = other_b;
+        other_color = COLOR_NONE;
+        if (cursor_visible && cursor_color != COLOR_NONE) other_color = cursor_color;
+        else if (canvas4_visible && canvas4_color != COLOR_NONE) other_color = canvas4_color;
+        else if (canvas3_visible && canvas3_color != COLOR_NONE) other_color = canvas3_color;
+        else if (canvas2_visible && canvas2_color != COLOR_NONE) other_color = canvas2_color;
+        else if (canvas1_visible && canvas1_color != COLOR_NONE) other_color = canvas1_color;
+        else begin
+            render_r = camera_r;
+            render_g = camera_g;
+            render_b = camera_b;
+        end
     end
 endmodule
 
 module compositor_testbench();
     parameter WIDTH=8, HEIGHT=8;
     logic clk, reset;
-    logic [COLOR_WIDTH-1:0] camera_color;
+    logic [7:0] camera_r, camera_g, camera_b;
     logic [COLOR_WIDTH-1:0] cursor_color;
     logic cursor_visible;
     logic [COLOR_WIDTH-1:0] canvas1_color;
@@ -46,13 +59,17 @@ module compositor_testbench();
     logic canvas3_visible;
     logic [COLOR_WIDTH-1:0] canvas4_color;
     logic canvas4_visible;
-    logic [COLOR_WIDTH-1:0] render_color;
+    logic [7:0] render_r, render_g, render_b;
 
     compositor #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) dut(
-        .camera_color, .cursor_color, .cursor_visible,
+        .camera_r, .camera_g, .camera_b,
+        .cursor_color, .cursor_visible,
         .canvas1_color, .canvas1_visible, .canvas2_color, .canvas2_visible,
         .canvas3_color, .canvas3_visible, .canvas4_color, .canvas4_visible,
-        .render_color);
+        .render_r, .render_g, .render_b);
+
+    logic [23:0] rgb_out;
+    assign rgb_out = {render_r, render_g, render_b};
 
     initial begin
         cursor_color = COLOR_BLACK;
@@ -65,19 +82,19 @@ module compositor_testbench();
         canvas2_visible = 1;
         canvas1_color = COLOR_BLUE;
         canvas1_visible = 1;
-        camera_color = COLOR_NONE;
+        {camera_r, camera_g, camera_b} = 24'h12_34_56;
         #10;
-        assert(render_color == COLOR_BLACK);
+        assert(rgb_out == 24'h0); // Black
         #1; cursor_visible = 0; #9;
-        assert(render_color == COLOR_WHITE);
+        assert(rgb_out == 24'hFF_FF_FF); // White
         #1; canvas4_visible = 0; #9;
-        assert(render_color == COLOR_RED);
+        assert(rgb_out == 24'hFF_00_00); // Red
         #1; canvas3_visible = 0; #9;
-        assert(render_color == COLOR_GREEN);
+        assert(rgb_out == 24'h00_FF_00); // Green
         #1; canvas2_visible = 0; #9;
-        assert(render_color == COLOR_BLUE);
+        assert(rgb_out == 24'h00_00_FF); // Blue
         #1; canvas1_visible = 0; #9;
-        assert(render_color == COLOR_NONE);
+        assert(rgb_out == 24'h12_34_56); // Camera color
     end
 endmodule
 

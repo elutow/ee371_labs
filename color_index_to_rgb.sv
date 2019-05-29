@@ -8,7 +8,6 @@ module color_index_to_rgb(
     );
 
     always_comb begin
-        assert(index != COLOR_NONE);
         case (index)
             COLOR_BLACK: {r, g, b} = 24'h0;
             COLOR_WHITE: {r, g, b} = 24'hFF_FF_FF;

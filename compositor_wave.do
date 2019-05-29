@@ -10,8 +10,13 @@ add wave -noupdate /compositor_testbench/canvas3_visible
 add wave -radix unsigned -noupdate /compositor_testbench/canvas3_color
 add wave -noupdate /compositor_testbench/canvas4_visible
 add wave -radix unsigned -noupdate /compositor_testbench/canvas4_color
-add wave -radix unsigned -noupdate /compositor_testbench/camera_color
-add wave -radix unsigned -noupdate /compositor_testbench/render_color
+add wave -radix unsigned -noupdate /compositor_testbench/dut/other_color
+add wave -radix hex -noupdate /compositor_testbench/camera_r
+add wave -radix hex -noupdate /compositor_testbench/camera_g
+add wave -radix hex -noupdate /compositor_testbench/camera_b
+add wave -radix hex -noupdate /compositor_testbench/render_r
+add wave -radix hex -noupdate /compositor_testbench/render_g
+add wave -radix hex -noupdate /compositor_testbench/render_b
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {223 ps} 0}
 quietly wave cursor active 1

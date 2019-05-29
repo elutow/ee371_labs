@@ -27,8 +27,9 @@ add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas4_color
 add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas3_color
 add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas2_color
 add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/canvas1_color
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/composer/camera_color
-add wave -radix unsigned -noupdate /DE1_SoC_testbench/dut/render_color
+add wave -radix hex -noupdate /DE1_SoC_testbench/dut/vga_r
+add wave -radix hex -noupdate /DE1_SoC_testbench/dut/vga_g
+add wave -radix hex -noupdate /DE1_SoC_testbench/dut/vga_b
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {223 ps} 0}
 quietly wave cursor active 1
