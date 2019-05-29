@@ -22,7 +22,8 @@ module color_selector
                     COLOR_WHITE: next_color = COLOR_RED;
                     COLOR_RED: next_color = COLOR_GREEN;
                     COLOR_GREEN: next_color = COLOR_BLUE;
-                    COLOR_BLUE: next_color = COLOR_BLACK;
+                    COLOR_BLUE: next_color = COLOR_NONE;
+                    COLOR_NONE: next_color = COLOR_BLACK;
                     default: next_color = 'x;
                 endcase
             end

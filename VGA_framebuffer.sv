@@ -9,7 +9,6 @@ module VGA_framebuffer
 (
  input logic        clk50, reset,
  input logic [7:0] r, g, b, // Pixel color
- input logic        pixel_write,
 
  output logic [$clog2(WIDTH)-1:0] request_x,
  output logic [$clog2(HEIGHT)-1:0] request_y,

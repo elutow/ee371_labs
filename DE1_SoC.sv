@@ -29,9 +29,9 @@ module DE1_SoC
     logic [$clog2(WIDTH)-1:0] request_x;
     logic [$clog2(HEIGHT)-1:0] request_y;
     // Cursor renderer I/O
-    logic cursor_left, cursor_middle, cursor_right;
+    logic cursor_left, cursor_right;
     logic [$clog2(WIDTH)-1:0] cursor_x;
-    logic [$clog2(HEIGHT)-1:0] cursor_y;
+    logic [$clog2(HEIGHT)-1:0] raw_cursor_y, cursor_y;
     logic [COLOR_WIDTH-1:0] cursor_color;
     // Freehand tool I/O
     logic [$clog2(WIDTH)-1:0] tool_x;
@@ -44,13 +44,13 @@ module DE1_SoC
     logic reset;
     logic canvas1_visible, canvas2_visible, canvas3_visible, canvas4_visible;
     logic cursor_visible;
-    logic ps2_start;
+    logic layer_toggle;
 
     // Metastability filters
     metastability_filter reset_filter(
-        .clk(CLOCK_50), .reset(1'b0), .direct_in(~KEY[2]), .filtered_out(reset));
-    metastability_filter ps2_start_filter(
-        .clk(CLOCK_50), .reset, .direct_in(~KEY[1]), .filtered_out(ps2_start));
+        .clk(CLOCK_50), .reset(1'b0), .direct_in(~KEY[3]), .filtered_out(reset));
+    metastability_filter layer_toggle_filter(
+        .clk(CLOCK_50), .reset, .direct_in(~KEY[0]), .filtered_out(layer_toggle));
     metastability_filter cursor_visible_filter(
         .clk(CLOCK_50), .reset, .direct_in(SW[0]), .filtered_out(cursor_visible));
     metastability_filter frame1_visible_filter(
@@ -62,7 +62,7 @@ module DE1_SoC
     color_selector select_color(
         .clk(CLOCK_50), .reset, .toggle(cursor_right), .color(current_color));
     layer_selector select_layer(
-        .clk(CLOCK_50), .reset, .toggle(cursor_middle), .layer(current_layer));
+        .clk(CLOCK_50), .reset, .toggle(layer_toggle), .layer(current_layer));
     freehand_tool #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) tool_freehand(
         .clk(CLOCK_50), .reset, .enable(cursor_left), .cursor_x, .cursor_y, .input_color(current_color),
         .pixel_x(tool_x), .pixel_y(tool_y), .pixel_color(tool_color));
@@ -86,7 +86,7 @@ module DE1_SoC
 
     // Drawing I/O to VGA I/O
     compositor #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) composer(
-        .camera_r(8'h11), .camera_g(8'h11), .camera_b(8'h11),
+        .camera_r(8'h00), .camera_g(8'hAA), .camera_b(8'hAA),
         .cursor_color, .cursor_visible,
         .canvas1_color, .canvas1_visible,
         .canvas2_color, .canvas2_visible,
@@ -95,16 +95,18 @@ module DE1_SoC
         .render_r(vga_r), .render_g(vga_g), .render_b(vga_b));
 
     // Peripheral attachments
-    ps2 #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) ps2_mouse(
-        .CLOCK_50, .start(ps2_start), .reset, .PS2_CLK, .PS2_DAT,
-        .button_left(cursor_left), .button_middle(cursor_middle), .button_right(cursor_right),
-        .bin_x(cursor_x), .bin_y(cursor_y));
+    ps2 #(.WIDTH(WIDTH), .HEIGHT(HEIGHT), .HYSTERESIS(2), .BIN(5)) ps2_mouse(
+        .CLOCK_50, .start(reset), .reset, .PS2_CLK, .PS2_DAT,
+        .button_left(cursor_left), .button_middle(), .button_right(cursor_right),
+        .bin_x(cursor_x), .bin_y(raw_cursor_y));
+    // Invert y coordinates
+    assign cursor_y = $clog2(HEIGHT)'(HEIGHT-1) - $clog2(HEIGHT)'(raw_cursor_y);
     // NOTE: VGA driver is hardcoded to 640x480. It will not function
     // correctly at other resolutions! (But for the sake of testbenching, it
     // will run)
     VGA_framebuffer #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) fb(
         .clk50(CLOCK_50), .reset, .request_x, .request_y,
-        .r(vga_r), .g(vga_g), .b(vga_b), .pixel_write(1'b1),
+        .r(vga_r), .g(vga_g), .b(vga_b),
         .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
         .VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
 

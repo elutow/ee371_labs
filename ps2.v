@@ -237,7 +237,7 @@ begin
 		if($signed(x_latch) >= THRESHOLD)
 		begin
 			x_latch <= x_latch - BIN;
-			if(oX_BIN != HEIGHT-1)
+			if(oX_BIN != WIDTH-1)
 			begin
 				oX_BIN <= oX_BIN + 1'b1;
 			end

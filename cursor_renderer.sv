@@ -35,32 +35,13 @@ module cursor_renderer
             STATE_DRAW: begin
                 ns = STATE_DRAW;
                 next_color = color;
+                next_step = step + 'd1;
                 unique case (step)
-                    0: begin
-                        next_x = x;
-                        next_y = y;
-                        next_step = 'd1;
-                    end
-                    1: begin
-                        next_x = x + 'd1;
-                        next_y = y;
-                        next_step = 'd2;
-                    end
-                    2: begin
-                        next_x = x;
-                        next_y = y + 'd1;
-                        next_step = 'd3;
-                    end
-                    3: begin
-                        next_x = x - 'd1;
-                        next_y = y;
-                        next_step = 'd4;
-                    end
-                    4: begin
-                        next_x = x;
-                        next_y = y - 'd1;
-                        next_step = 'd5;
-                    end
+                    0: {next_x, next_y} = {x, y};
+                    1: {next_x, next_y} = {x + 'd1, y};
+                    2: {next_x, next_y} = {x, y + 'd1};
+                    3: {next_x, next_y} = {x - 'd1, y};
+                    4: {next_x, next_y} = {x, y - 'd1};
                     5: begin
                         next_x = x;
                         next_y = y;
@@ -82,32 +63,13 @@ module cursor_renderer
             STATE_ERASE: begin
                 ns = STATE_ERASE;
                 next_color = COLOR_NONE;
+                next_step = step + 'd1;
                 case (step)
-                    0: begin
-                        next_x = x;
-                        next_y = y;
-                        next_step = 'd1;
-                    end
-                    1: begin
-                        next_x = x + 'd1;
-                        next_y = y;
-                        next_step = 'd2;
-                    end
-                    2: begin
-                        next_x = x;
-                        next_y = y + 'd1;
-                        next_step = 'd3;
-                    end
-                    3: begin
-                        next_x = x - 'd1;
-                        next_y = y;
-                        next_step = 'd4;
-                    end
-                    4: begin
-                        next_x = x;
-                        next_y = y - 'd1;
-                        next_step = 'd5;
-                    end
+                    0: {next_x, next_y} = {x, y};
+                    1: {next_x, next_y} = {x + 'd1, y};
+                    2: {next_x, next_y} = {x, y + 'd1};
+                    3: {next_x, next_y} = {x - 'd1, y};
+                    4: {next_x, next_y} = {x, y - 'd1};
                     5: begin
                         next_x = x;
                         next_y = y;
