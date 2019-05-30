@@ -145,10 +145,11 @@ module DE1_SoC_testbench();
 
     int i;
     initial begin
-        KEY[2] <= 0; @(posedge CLOCK_50);
-        KEY[2] <= 1; @(posedge CLOCK_50);
-        KEY[1] <= 0; @(posedge CLOCK_50);
-        KEY[1] <= 1; @(posedge CLOCK_50);
+        SW[0] <= 1;
+        SW[1] <= 1;
+        SW[2] <= 1;
+        KEY[3] <= 0; @(posedge CLOCK_50);
+        KEY[3] <= 1; @(posedge CLOCK_50);
         for (i=0; i<20; i++) begin
             @(posedge CLOCK_50);
         end
