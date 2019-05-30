@@ -39,6 +39,28 @@ module MIPI_CAMERA_CONFIG  (
 //parameter     BB = 14'h400;
 
 
+//=====================I2C READ ===
+wire R_SCL; 
+wire R_END; 
+reg  R_GO; 
+wire R_SDAO;  
+
+wire   RESET_N_1 ;
+
+//=====================WRITE TABLE 
+reg [31:0] SLV8_REG16_DATA8;
+wire [7:0] TIME_DELAY  ; 
+
+//==== I2C WRITE WORD ===
+wire   W_WORD_SCL ; 
+wire   W_WORD_SDAO ;  
+
+//==== I2C WRITE POINTER ===
+wire   W_POINTER_SCL ; 
+wire   W_POINTER_END ; 
+reg    W_POINTER_GO ; 
+wire   W_POINTER_SDAO ;  
+
 //----RGB  GAIN  ----- 
 wire [13:0] RR; 
 wire [13:0] GG; 
@@ -224,9 +246,6 @@ assign I2C_SCL_O = ( W_WORD_SCL  & W_POINTER_SCL & R_SCL ) || ( RESET_N==0 )  ;
 assign SDAO      = ( W_POINTER_SDAO & R_SDAO  & W_WORD_SDAO ) ||  ( RESET_N==0 )  ;
 assign I2C_SDA   = (  SDAO  )?1'bz :const_zero_sig;//1'b0 ; 
 assign I2C_SCL   = (ST==0)?0: ( ( I2C_SCL_O )? 1'b1:1'b0 )  ;
-//==== I2C WRITE WORD ===
-wire   W_WORD_SCL ; 
-wire   W_WORD_SDAO ;  
 
 I2C_WRITE_WDATA wrd(
    .RESET_N      ( RESET_N_1),
@@ -249,12 +268,6 @@ I2C_WRITE_WDATA wrd(
 	.BYTE_NUM     (3 )  // 3byte
 );
 
-//==== I2C WRITE POINTER ===
-wire   W_POINTER_SCL ; 
-wire   W_POINTER_END ; 
-reg    W_POINTER_GO ; 
-wire   W_POINTER_SDAO ;  
-
 I2C_WRITE_PTR   wpt(
    .RESET_N      (RESET_N_1  ),
 	.PT_CK        (CLK_400K ),
@@ -273,13 +286,6 @@ I2C_WRITE_PTR   wpt(
    .BYTE_END (2) 	//2 BYTE POINTER 
 );
 
-
-//=====================I2C READ ===
-
-wire R_SCL; 
-wire R_END; 
-reg  R_GO; 
-wire R_SDAO;  
 
 I2C_READ_DATA  rd( //
    .RESET_N      (RESET_N_1),
@@ -303,18 +309,12 @@ I2C_READ_DATA  rd( //
 
 
 
-wire   RESET_N_1 ;
 
 I2C_RESET_DELAY DY (
   .CLK     (CLK_50), 
   .READY   (RESET_N_1)
 ) ; 
 
-
-//=====================WRITE TABLE 
-
-reg [31:0] SLV8_REG16_DATA8;
-wire [7:0] TIME_DELAY  ; 
 
 assign TIME_DELAY   =  DELAY_TYPE ; 
 

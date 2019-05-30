@@ -14,7 +14,10 @@ module MIPI_BRIDGE_CAMERA_Config   (
 
  ); 
  
+wire CLK_400K ; 
 
+//--D8M CAMERA I2C -- 
+wire CAMERA_I2C_SCL_ ; 
 
  //wire VCM_RELAESE ;
  wire VCM_I2C_SCL ; 
@@ -32,8 +35,6 @@ assign  VCM_RELAESE =1 ;
 //--Camera share  SCL -- 
 assign CAMERA_I2C_SCL = ( !VCM_RELAESE)  ?  VCM_I2C_SCL  : CAMERA_I2C_SCL_ ;
  
-//--D8M CAMERA I2C -- 
-wire CAMERA_I2C_SCL_ ; 
 MIPI_CAMERA_CONFIG  camiv( 
    .RESET_N ( VCM_RELAESE & RESET_N  &  MIPI_I2C_RELEASE ),
 	.TR_IN   ( ) , 	
@@ -45,7 +46,6 @@ MIPI_CAMERA_CONFIG  camiv(
 	.MIPI_CAMERA_RELAESE  ( CAMERA_I2C_RELAESE )
 );
 
-wire CLK_400K ; 
 //--MIPI BRIDGE I2C -- 
 MIPI_BRIDGE_CONFIG  mpiv( 
    .RESET_N  (RESET_N) ,  

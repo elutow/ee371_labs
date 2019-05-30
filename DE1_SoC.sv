@@ -3,14 +3,18 @@
 module DE1_SoC
     #(parameter WIDTH=640, HEIGHT=480)
     (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50, PS2_CLK, PS2_DAT,
-    VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS);
+    VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS,
+    CLOCK2_50, CLOCK3_50, DRAM_ADDR, DRAM_BA, DRAM_CAS_N, DRAM_CKE, DRAM_CLK,
+    DRAM_CS_N, DRAM_DQ, DRAM_RAS_N, DRAM_WE_N, CAMERA_I2C_SCL, CAMERA_I2C_SDA,
+    CAMERA_PWDN_n, MIPI_CS_n, MIPI_I2C_SCL, MIPI_I2C_SDA, MIPI_MCLK, MIPI_PIXEL_CLK,
+    MIPI_PIXEL_D, MIPI_PIXEL_HS, MIPI_PIXEL_VS, MIPI_REFCLK, MIPI_RESET_n);
 
     output logic [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
     output logic [9:0] LEDR;
     input logic [3:0] KEY;
     input logic [9:0] SW;
 
-    input CLOCK_50;
+    input CLOCK_50, CLOCK2_50, CLOCK3_50;
     inout PS2_CLK, PS2_DAT;
     output [7:0] VGA_R;
     output [7:0] VGA_G;
@@ -21,10 +25,35 @@ module DE1_SoC
     output VGA_SYNC_N;
     output VGA_VS;
 
+    inout [15:0] DRAM_DQ;
+    output [12:0] DRAM_ADDR;
+    output [1:0] DRAM_BA;
+    output DRAM_CAS_N;
+    output DRAM_CKE;
+    output DRAM_CLK;
+    output DRAM_CS_N;
+    output DRAM_RAS_N;
+    output DRAM_WE_N;
+
+    inout CAMERA_I2C_SDA;
+    inout MIPI_I2C_SCL;
+    inout MIPI_I2C_SDA;
+    input MIPI_PIXEL_CLK;
+    input MIPI_PIXEL_HS;
+    input MIPI_PIXEL_VS;
+    input [9:0] MIPI_PIXEL_D;
+    output CAMERA_I2C_SCL;
+    output CAMERA_PWDN_n;
+    output MIPI_CS_n;
+    output MIPI_MCLK;
+    output MIPI_REFCLK;
+    output MIPI_RESET_n;
+
     // Inter-module signals
     logic [COLOR_WIDTH-1:0] current_color;
     logic [2:0] current_layer;
     // VGA I/O
+    logic vga_read_enable;
     logic [7:0] vga_r, vga_g, vga_b;
     logic [$clog2(WIDTH)-1:0] request_x;
     logic [$clog2(HEIGHT)-1:0] request_y;
@@ -39,12 +68,15 @@ module DE1_SoC
     logic [COLOR_WIDTH-1:0] tool_color;
     // Drawing canvas I/O
     logic [COLOR_WIDTH-1:0] canvas1_color, canvas2_color, canvas3_color, canvas4_color;
+    // Terasic camera I/O
+    logic [7:0] camera_r, camera_g, camera_b;
 
     // Filtered signals
     logic reset;
     logic canvas1_visible, canvas2_visible, canvas3_visible, canvas4_visible;
     logic cursor_visible;
     logic layer_toggle;
+    logic take_picture;
 
     // Metastability filters
     metastability_filter reset_filter(
@@ -57,6 +89,8 @@ module DE1_SoC
         .clk(CLOCK_50), .reset, .direct_in(SW[1]), .filtered_out(canvas1_visible));
     metastability_filter frame2_visible_filter(
         .clk(CLOCK_50), .reset, .direct_in(SW[2]), .filtered_out(canvas2_visible));
+    metastability_filter take_picture_filter(
+        .clk(CLOCK_50), .reset, .direct_in(SW[9]), .filtered_out(take_picture));
 
     // Cursor logic attachments
     color_selector select_color(
@@ -86,7 +120,7 @@ module DE1_SoC
 
     // Drawing I/O to VGA I/O
     compositor #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) composer(
-        .camera_r(8'h00), .camera_g(8'hAA), .camera_b(8'hAA),
+        .camera_r, .camera_g, .camera_b,
         .cursor_color, .cursor_visible,
         .canvas1_color, .canvas1_visible,
         .canvas2_color, .canvas2_visible,
@@ -103,9 +137,17 @@ module DE1_SoC
     assign cursor_y = $clog2(HEIGHT)'(HEIGHT-1) - $clog2(HEIGHT)'(raw_cursor_y);
     video_driver #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) vga_driver(
         .CLOCK_50, .reset, .x(request_x), .y(request_y),
-        .r(vga_r), .g(vga_g), .b(vga_b),
+        .r(vga_r), .g(vga_g), .b(vga_b), .read_enable(vga_read_enable),
         .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
         .VGA_BLANK_N, .VGA_SYNC_N);
+    terasic_camera gpio_camera(
+        .reset, .take_picture, .READ_Request(vga_read_enable),
+        .out_r(camera_r), .out_g(camera_g), .out_b(camera_b),
+        .DRAM_ADDR, .DRAM_BA, .DRAM_CAS_N, .DRAM_CKE, .DRAM_CLK, .DRAM_CS_N, .DRAM_DQ,
+        .DRAM_RAS_N, .DRAM_WE_N, .CLOCK2_50, .CLOCK3_50, .CLOCK_50, .VGA_HS, .VGA_VS, .VGA_CLK,
+        .CAMERA_I2C_SCL, .CAMERA_I2C_SDA, .CAMERA_PWDN_n, .MIPI_CS_n, .MIPI_I2C_SCL,
+        .MIPI_I2C_SDA, .MIPI_MCLK, .MIPI_PIXEL_CLK, .MIPI_PIXEL_D, .MIPI_PIXEL_HS, .MIPI_PIXEL_VS,
+        .MIPI_REFCLK, .MIPI_RESET_n);
 
     // Misc board I/O attachments
     seg7 layer_display(

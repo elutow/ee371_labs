@@ -663,7 +663,9 @@ set_global_assignment -name SYSTEMVERILOG_FILE layer_selector.sv
 set_global_assignment -name SYSTEMVERILOG_FILE metastability_filter.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ps2.sv
 set_global_assignment -name SYSTEMVERILOG_FILE seg7.sv
+set_global_assignment -name SYSTEMVERILOG_FILE terasic_camera.sv
 set_global_assignment -name SYSTEMVERILOG_FILE video_driver.sv
+set_global_assignment -name VERILOG_FILE V/CLOCKMEM.v
 set_global_assignment -name VERILOG_FILE V/CLOCK_DELAY.v
 set_global_assignment -name VERILOG_FILE V/I2C_READ_DATA.v
 set_global_assignment -name VERILOG_FILE V/I2C_RESET_DELAY.v

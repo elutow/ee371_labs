@@ -43,6 +43,24 @@ output reg  R_GO,
    output [15:0 ] MCLKControlRegister 	
 	);
 
+//-------WRITE TABLE 
+reg [31:0] REG16_DATA16;
+
+//==== I2C WRITE WORD ===
+wire   W_WORD_SCL ; 
+wire   W_WORD_SDAO ;  
+
+//==== I2C WRITE POINTER ===
+wire   W_POINTER_SCL ; 
+wire   W_POINTER_SDAO ;  
+
+//==== I2C READ ===
+wire R_SCL; 
+wire R_SDAO;  
+
+//---I2C DELAY --- 	
+wire   RESET_N_1 ;
+
 parameter WORD_NUM_MAX = 13 	 ; 
 //wire [10:0] WORD_NUM_MAX ; 
 //assign WORD_NUM_MAX  = 1; 
@@ -245,9 +263,6 @@ assign PLLControlRegister3   = ((PPICLKDIV<<4) + (MCLKREFDIV<<2) + SCLKDIV );
 assign MCLKControlRegister = ((MCLK_HL<<8) + MCLK_HL);                              
 
 
-//-------WRITE TABLE 
-reg [31:0] REG16_DATA16;
-
 //static SZ_MIPI_REG_T MipiBridgeReg[] = {
 always @(posedge CLK_400K )begin 
 case (WCNT) 
@@ -282,10 +297,6 @@ assign SDAO            = W_POINTER_SDAO & R_SDAO  & W_WORD_SDAO;
 assign I2C_SDA =     ( ( SDAO )  ||     ( RESET_N==0 ) )?1'bz :const_zero_sig;//1'b0 ; 
 assign I2C_SCL =     ( ( I2C_SCL_O)  || ( RESET_N==0 ) )?1'b1 :1'b0;//const_zero_sig;//1'b0 ;
 
-//==== I2C WRITE WORD ===
-wire   W_WORD_SCL ; 
-wire   W_WORD_SDAO ;  
-
 I2C_WRITE_WDATA  wrd(
    .RESET_N      ( RESET_N_1),
 	.PT_CK        ( CLK_400K),
@@ -309,11 +320,6 @@ I2C_WRITE_WDATA  wrd(
 );
 
 
-//==== I2C WRITE POINTER ===
-wire   W_POINTER_SCL ; 
- 
-wire   W_POINTER_SDAO ;  
-
 I2C_WRITE_PTR	  wpt(
    .RESET_N (RESET_N_1),
 	.PT_CK        (CLK_400K),
@@ -333,10 +339,6 @@ I2C_WRITE_PTR	  wpt(
 );
 
 
-//==== I2C READ ===
-
-wire R_SCL; 
-wire R_SDAO;  
 
 I2C_READ_DATA rd( //
    .RESET_N (RESET_N_1),
@@ -361,8 +363,6 @@ I2C_READ_DATA rd( //
 	
 	
 
-//---I2C DELAY --- 	
-wire   RESET_N_1 ;
 
 I2C_RESET_DELAY DY (
   .CLK     (CLK_50), 

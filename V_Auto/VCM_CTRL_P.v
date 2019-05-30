@@ -46,6 +46,16 @@ assign  Y1[7:0]  = Y[15:8] ;
 wire TR ; 
 assign TR  =  (SW_FUC_ALL_CEN)? ACTIV_C : ACTIV_V  ; 
 
+wire  [15:0] R_VCM_DATA ; 
+  
+
+reg     [9:0]  STEP_UP ;  
+wire    [9:0]  END_STEP ; 
+wire    V_C ; 
+
+wire GO_F ; 
+reg  rGO_F ;
+
 //--  
 always @( posedge VIDEO_CLK ) begin
      { rY2, rY1}  <= { rY1 ,Y1 }  ;
@@ -72,17 +82,9 @@ always @( posedge VIDEO_CLK ) begin
 end
 
 //-------------------VCM STEP ---
-wire  [15:0] R_VCM_DATA ; 
-  
-
-reg     [9:0]  STEP_UP ;  
-wire    [9:0]  END_STEP ; 
-wire    V_C ; 
 
 assign END_STEP  = ( VCM_END )? STEP_UP[9:0]  :  STEP[9:0]; 
 assign VCM_DATA  = {2'b00, END_STEP[9:0]   ,4'b1111 }; // 
-wire GO_F ; 
-reg  rGO_F ;
 F_VCM  f( 
        .RESET_n ( AUTO_FOC  ),  
        .CLK     ( VS ), 

@@ -49,6 +49,28 @@ parameter    P_STATUS           =8'h00;
 
 parameter    TIME               = 32'd400000/400 ;  
 parameter    TIME_LONG          = 250000000 ;  
+
+//I2C-BUS
+wire   SDAO; 
+
+//==== I2C WRITE POINTER ===
+wire   W_POINTER_SCL ; 
+wire   W_POINTER_END ; 
+reg    W_POINTER_GO ; 
+wire   W_POINTER_SDAO ;  
+
+//==== I2C WRITE WORD ===
+wire   W_WORD_SCL ; 
+wire   W_WORD_SDAO ;  
+
+//==== I2C READ ===
+wire R_SCL; 
+wire R_END; 
+reg  R_GO; 
+wire R_SDAO;  
+
+wire   RESET_N_1 ;
+
 //----
 reg [31:0] DELY ;
 always @(negedge RESET_N or posedge CLK_400K )begin 
@@ -198,17 +220,10 @@ end
 wire const_zero_sig/* synthesis keep */ ; 
 assign const_zero_sig = 0 ; 
 
-//I2C-BUS
-wire   SDAO; 
-
 assign I2C_SCL_O       = W_WORD_SCL & W_POINTER_SCL & R_SCL ;
 assign SDAO            = W_POINTER_SDAO & R_SDAO  & W_WORD_SDAO;
 assign I2C_SDA         = ( ( SDAO )     ||  ( RESET_N==0 ) )?1'bz :const_zero_sig;
 assign I2C_SCL         = ( ( I2C_SCL_O)  || ( RESET_N==0 ) )?1'b1 :0 ;
-
-//==== I2C WRITE WORD ===
-wire   W_WORD_SCL ; 
-wire   W_WORD_SDAO ;  
 
 I2C_WRITE_WDATA  wrd(
    .RESET_N      (RESET_N_1 ),//(RESET_SUB_N ),// RESET_N),
@@ -235,12 +250,6 @@ I2C_WRITE_WDATA  wrd(
 	
 );
 
-//==== I2C WRITE POINTER ===
-wire   W_POINTER_SCL ; 
-wire   W_POINTER_END ; 
-reg    W_POINTER_GO ; 
-wire   W_POINTER_SDAO ;  
-
 I2C_WRITE_PTR  wpt(
    .RESET_N (RESET_N_1 ),//(RESET_SUB_N),// RESET_N),
 	.PT_CK        (   CLK_400K),
@@ -258,14 +267,6 @@ I2C_WRITE_PTR  wpt(
 	.BYTE() ,
    .BYTE_END (1) 	 //1 byte 
 );
-
-
-//==== I2C READ ===
-
-wire R_SCL; 
-wire R_END; 
-reg  R_GO; 
-wire R_SDAO;  
 
 I2C_READ_DATA rd( //
    .RESET_N (RESET_N_1 ),//RESET_SUB_N ),// RESET_N),
@@ -285,13 +286,6 @@ I2C_READ_DATA rd( //
 	.BYTE  ()  	,
 	.END_BYTE  (1) //read 2 byte  	
 );
-
-
-
-
-
-	
-wire   RESET_N_1 ;
 
 I2C_RESET_DELAY  DY (
   .CLK     (CLK_50), 
