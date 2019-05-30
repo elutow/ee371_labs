@@ -19,7 +19,7 @@ module cursor_renderer
     logic [$clog2(HEIGHT)-1:0] y, next_y;
     logic [COLOR_WIDTH-1:0] color, next_color;
     // Animation step
-    logic [$clog2(140):0] step, next_step;
+    logic [3:0] step, next_step;
 
     enum {STATE_INIT, STATE_DRAW, STATE_ERASE} ps, ns;
 
@@ -37,15 +37,54 @@ module cursor_renderer
                 next_color = color;
                 next_step = step + 'd1;
                 unique case (step)
-                    `include "cursor_renderer_draw_steps.sv"
+                    0: {next_x, next_y} = {x, y};
+                    1: {next_x, next_y} = {x + 'd1, y};
+                    2: {next_x, next_y} = {x, y + 'd1};
+                    3: {next_x, next_y} = {x - 'd1, y};
+                    4: {next_x, next_y} = {x, y - 'd1};
+                    5: begin
+                        next_x = x;
+                        next_y = y;
+                        next_step = step;
+                        if (x != cursor_x || y != cursor_y) begin
+                            next_step = 0;
+                            ns = STATE_ERASE;
+                        end
+                    end
+                    default: begin
+                        next_x = 'x;
+                        next_y = 'x;
+                        next_step = 'x;
+                        $error("Default of STATE_DRAW reached!");
+                        $stop;
+                    end
                 endcase
             end
             STATE_ERASE: begin
                 ns = STATE_ERASE;
                 next_color = COLOR_NONE;
                 next_step = step + 'd1;
-                unique case (step)
-                    `include "cursor_renderer_erase_steps.sv"
+                case (step)
+                    0: {next_x, next_y} = {x, y};
+                    1: {next_x, next_y} = {x + 'd1, y};
+                    2: {next_x, next_y} = {x, y + 'd1};
+                    3: {next_x, next_y} = {x - 'd1, y};
+                    4: {next_x, next_y} = {x, y - 'd1};
+                    5: begin
+                        next_x = x;
+                        next_y = y;
+                        next_step = step;
+                        if (x != cursor_x || y != cursor_y) begin
+                            ns = STATE_INIT;
+                        end
+                    end
+                    default: begin
+                        next_x = 'x;
+                        next_y = 'x;
+                        next_step = 'x;
+                        $error("Default of STATE_ERASE reached!");
+                        $stop;
+                    end
                 endcase
             end
         endcase
@@ -72,7 +111,7 @@ module cursor_renderer
 endmodule
 
 module cursor_renderer_testbench();
-    parameter WIDTH=32, HEIGHT=32;
+    parameter WIDTH=8, HEIGHT=8;
     logic clk, reset;
     logic [$clog2(WIDTH)-1:0] cursor_x;
     logic [$clog2(HEIGHT)-1:0] cursor_y;
@@ -99,14 +138,29 @@ module cursor_renderer_testbench();
         reset <= 1; @(posedge clk);
         reset <= 0; @(posedge clk);
         // Test drawing in one location
-        for (i=0; i<142; i++) begin
+        for (i=0; i<7; i++) begin
+            @(posedge clk);
+        end
+        assert(
+            dut.cursor_frame[0][0] == COLOR_BLUE
+            && dut.cursor_frame[0][1] == COLOR_BLUE
+            && dut.cursor_frame[1][0] == COLOR_BLUE
+            && dut.cursor_frame[1][1] == COLOR_BLUE
+        );
+        cursor_x <= 1; cursor_y <= 1; @(posedge clk);
+        for (i=0; i<15; i++) begin
             @(posedge clk);
         end
         // Test erasing and drawing in new location
-        cursor_x <= 5; cursor_y <= 5; @(posedge clk);
-        for (i=0; i<142; i++) begin
-            @(posedge clk);
-        end
+        assert(
+            dut.cursor_frame[0][0] == COLOR_NONE
+            && dut.cursor_frame[0][1] == COLOR_NONE
+            && dut.cursor_frame[1][0] == COLOR_NONE
+            && dut.cursor_frame[1][1] == COLOR_BLUE
+            && dut.cursor_frame[1][2] == COLOR_BLUE
+            && dut.cursor_frame[2][1] == COLOR_BLUE
+            && dut.cursor_frame[2][2] == COLOR_BLUE
+        );
         $stop;
     end
 endmodule

@@ -3,7 +3,71 @@
 module DE1_SoC
     #(parameter WIDTH=640, HEIGHT=480)
     (HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, KEY, LEDR, SW, CLOCK_50, PS2_CLK, PS2_DAT,
-    VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS);
+    VGA_R, VGA_G, VGA_B, VGA_BLANK_N, VGA_CLK, VGA_HS, VGA_SYNC_N, VGA_VS
+
+    ADC_CONVST, ADC_DIN, ADC_SCLK,
+    AUD_ADCLRCK, AUD_BCLK, AUD_DACDAT, AUD_DACLRCK, AUD_XCK,
+    CLOCK2_50, CLOCK3_50, DRAM_ADDR, DRAM_BA, DRAM_CAS_N, DRAM_CKE,
+    DRAM_CLK, DRAM_CS_N, DRAM_DQ;, DRAM_LDQM, DRAM_RAS_N, DRAM_UDQM, DRAM_WE_N,
+    FPGA_I2C_SCLK, FPGA_I2C_SDAT, IRDA_TXD, TD_RESET_N;
+    CAMERA_I2C_SCL, CAMERA_I2C_SDA, CAMERA_PWDN_n, MIPI_CS_n, MIPI_I2C_SCL,
+    MIPI_I2C_SDA, MIPI_MCLK, MIPI_PIXEL_CLK, MIPI_PIXEL_D, MIPI_PIXEL_HS,
+    MIPI_PIXEL_VS, MIPI_REFCLK, MIPI_RESET_n
+    );
+
+    //////////// ADC //////////
+    output		          		ADC_CONVST;
+    output		          		ADC_DIN;
+    output		          		ADC_SCLK;
+
+    //////////// Audio //////////
+    inout 		          		AUD_ADCLRCK;
+    inout 		          		AUD_BCLK;
+    output		          		AUD_DACDAT;
+    inout 		          		AUD_DACLRCK;
+    output		          		AUD_XCK;
+
+    //////////// CLOCK //////////
+    input 		          		CLOCK2_50;
+    input 		          		CLOCK3_50;
+
+    //////////// SDRAM //////////
+    output		    [12:0]		DRAM_ADDR;
+    output		    [1:0]		  DRAM_BA;
+    output		          		DRAM_CAS_N;
+    output		          		DRAM_CKE;
+    output		          		DRAM_CLK;
+    output		          		DRAM_CS_N;
+    inout 		    [15:0]		DRAM_DQ;
+    output		          		DRAM_LDQM;
+    output		          		DRAM_RAS_N;
+    output		          		DRAM_UDQM;
+    output		          		DRAM_WE_N;
+
+    //////////// I2C for Audio and Video-In //////////
+    output		          		FPGA_I2C_SCLK;
+    inout 		          		FPGA_I2C_SDAT;
+
+    //////////// IR //////////
+    output		          		IRDA_TXD;
+
+    //////////// Video-In //////////
+    output		          		TD_RESET_N;
+
+    //////////// GPIO_1, GPIO_1 connect to D8M-GPIO //////////
+    output 		          		CAMERA_I2C_SCL;
+    inout 		          		CAMERA_I2C_SDA;
+    output		          		CAMERA_PWDN_n;
+    output		          		MIPI_CS_n;
+    inout 		          		MIPI_I2C_SCL;
+    inout 		          		MIPI_I2C_SDA;
+    output		          		MIPI_MCLK;
+    input 		          		MIPI_PIXEL_CLK;
+    input 		     [9:0]		MIPI_PIXEL_D;
+    input 		          		MIPI_PIXEL_HS;
+    input 		          		MIPI_PIXEL_VS;
+    output		          		MIPI_REFCLK;
+    output		          		MIPI_RESET_n;
 
     output logic [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
     output logic [9:0] LEDR;
@@ -86,7 +150,7 @@ module DE1_SoC
 
     // Drawing I/O to VGA I/O
     compositor #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) composer(
-        .camera_r(8'h00), .camera_g(8'hAA), .camera_b(8'hAA),
+        .camera_r(internal_VGA_R), .camera_g(internal_VGA_G), .camera_b(internal_VGA_B),
         .cursor_color, .cursor_visible,
         .canvas1_color, .canvas1_visible,
         .canvas2_color, .canvas2_visible,
@@ -113,6 +177,29 @@ module DE1_SoC
     // Misc board I/O attachments
     seg7 layer_display(
         .hex({1'b0, current_layer}), .out(HEX0));
+
+    //////////// VGA //////////
+    logic		          		internal_VGA_BLANK_N;
+    logic		     [7:0]		internal_VGA_B;
+    logic		          		internal_VGA_CLK;
+    logic		     [7:0]		internal_VGA_G;
+    logic		          		internal_VGA_HS;
+    logic		     [7:0]		internal_VGA_R;
+    logic		          		internal_VGA_SYNC_N;
+    logic		          		internal_VGA_VS;
+
+    DE1_SOC_D8M_RTL camera(.ADC_CONVST, .ADC_DIN, .ADC_SCLK,
+      .AUD_ADCLRCK, .AUD_BCLK, .AUD_DACDAT, .AUD_DACLRCK, .AUD_XCK,
+      .CLOCK2_50, .CLOCK3_50, .CLOCK_50,
+      .DRAM_ADDR, .DRAM_BA, .DRAM_CAS_N, .DRAM_CKE, .DRAM_CLK, .DRAM_CS_N,
+      .DRAM_DQ, .DRAM_LDQM, .DRAM_RAS_N, .DRAM_UDQM, .DRAM_WE_N,
+      .FPGA_I2C_SCLK, .FPGA_I2C_SDAT, .IRDA_TXD, .KEY, .SW, .TD_RESET_N,
+      .internal_VGA_BLANK_N, .internal_VGA_B, .internal_VGA_CLK, .internal_VGA_G,
+      .internal_VGA_HS, .internal_VGA_R, .internal_VGA_SYNC_N, .internal_VGA_VS,
+      .CAMERA_I2C_SCL, .CAMERA_I2C_SDA, .CAMERA_PWDN_n, .MIPI_CS_n, .MIPI_I2C_SCL,
+      .MIPI_I2C_SDA, .MIPI_MCLK, .MIPI_PIXEL_CLK, .MIPI_PIXEL_D, .MIPI_PIXEL_HS,
+      .MIPI_PIXEL_VS, .MIPI_REFCLK, .MIPI_RESET_n
+        );
 endmodule
 
 module DE1_SoC_testbench();
