@@ -101,20 +101,18 @@ module DE1_SoC
         .bin_x(cursor_x), .bin_y(raw_cursor_y));
     // Invert y coordinates
     assign cursor_y = $clog2(HEIGHT)'(HEIGHT-1) - $clog2(HEIGHT)'(raw_cursor_y);
-    // NOTE: VGA driver is hardcoded to 640x480. It will not function
-    // correctly at other resolutions! (But for the sake of testbenching, it
-    // will run)
-    VGA_framebuffer #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) fb(
-        .clk50(CLOCK_50), .reset, .request_x, .request_y,
+    video_driver #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) vga_driver(
+        .CLOCK_50, .reset, .x(request_x), .y(request_y),
         .r(vga_r), .g(vga_g), .b(vga_b),
         .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
-        .VGA_BLANK_n(VGA_BLANK_N), .VGA_SYNC_n(VGA_SYNC_N));
+        .VGA_BLANK_N, .VGA_SYNC_N);
 
     // Misc board I/O attachments
     seg7 layer_display(
         .hex({1'b0, current_layer}), .out(HEX0));
 endmodule
 
+`timescale 1 ps / 1 ps
 module DE1_SoC_testbench();
     logic [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
     logic [9:0] LEDR;
