@@ -61,9 +61,9 @@ module ps2
 //=======================================================
 //  PARAMETERS
 //=======================================================
-parameter UPPER_BITS = $clog2(WIDTH>HEIGHT?WIDTH:HEIGHT);
-parameter LOWER_BITS = $clog2(BIN+HYSTERESIS+256)+1;
-parameter THRESHOLD = BIN+HYSTERESIS;
+localparam UPPER_BITS = $clog2(WIDTH>HEIGHT?WIDTH:HEIGHT);
+localparam LOWER_BITS = $clog2(BIN+HYSTERESIS+256)+1;
+localparam THRESHOLD = BIN+HYSTERESIS;
 
 //=======================================================
 //  PORT declarations
@@ -85,7 +85,7 @@ output reg [UPPER_BITS-1:0] bin_y;
 //instruction define, users can charge the instruction byte here for other purpose according to ps/2 mouse datasheet.
 //the MSB is of parity check bit, that's when there are odd number of 1's with data bits, it's value is '0',otherwise it's '1' instead.
 
-parameter enable_byte =9'b011110100;
+localparam enable_byte =9'b011110100;
 
 
 //=======================================================
@@ -111,7 +111,7 @@ reg [UPPER_BITS-1:0] oY_BIN;
 //  PARAMETER declarations
 //=======================================================
 //state define
-parameter listen =2'b00,
+localparam listen =2'b00,
           pullclk=2'b01,
           pulldat=2'b10,
           trans  =2'b11;
@@ -123,7 +123,7 @@ parameter listen =2'b00,
 
 always@(posedge CLOCK_50)
 	begin
-		clk_div <= clk_div+1;
+		clk_div <= clk_div+9'b1;
 	end
 	
 assign clk = clk_div[8];
@@ -195,20 +195,20 @@ always@(posedge clk)
 begin
   if ({ps2_clk_in,ps2_dat_in} == 2'b11)
 	begin
-		cnt <= cnt+1;
+		cnt <= cnt+8'b1;
     end
   else begin
 		cnt <= 8'd0;
        end
 end
 //periodically reset ct; ct counts the received data length;
-assign flag = (cnt == 8'hff)?1:0;
+assign flag = (cnt == 8'hff) ? 1'b1 : 1'b0;
 always@(posedge ps2_clk_in,posedge flag)
 begin
   if (flag)
      ct <= 6'b000000;
   else
-     ct <= ct+1;
+     ct <= ct+6'b1;
 end
 //latch data from shift_reg;outputs is of 2's complement;
 //Please treat the cnt value here with caution, otherwise wrong data will be latched.
@@ -236,7 +236,7 @@ begin
 	begin
 		if($signed(x_latch) >= THRESHOLD)
 		begin
-			x_latch <= x_latch - BIN;
+			x_latch <= LOWER_BITS'(x_latch - BIN);
 			if(oX_BIN != WIDTH-1)
 			begin
 				oX_BIN <= oX_BIN + 1'b1;
@@ -244,7 +244,7 @@ begin
 		end
 		else if($signed(x_latch) <= -THRESHOLD)
 		begin
-			x_latch <= x_latch + BIN;
+			x_latch <= LOWER_BITS'(x_latch + BIN);
 			if(oX_BIN != 0)
 			begin
 				oX_BIN <= oX_BIN - 1'b1;
@@ -253,7 +253,7 @@ begin
 		
 		if($signed(y_latch) >= THRESHOLD)
 		begin
-			y_latch <= y_latch - BIN;
+			y_latch <= LOWER_BITS'(y_latch - BIN);
 			if(oY_BIN != HEIGHT-1)
 			begin
 				oY_BIN <= oY_BIN + 1'b1;
@@ -261,7 +261,7 @@ begin
 		end
 		else if($signed(y_latch) <= -THRESHOLD)
 		begin
-			y_latch <= y_latch + BIN;
+			y_latch <= LOWER_BITS'(y_latch + BIN);
 			if(oY_BIN != 0)
 			begin
 				oY_BIN <= oY_BIN - 1'b1;
@@ -275,7 +275,7 @@ end
 always@(posedge clk)
 begin
   if (cur_state == pullclk)
-     delay <= delay+1;
+     delay <= delay+4'b1;
   else
      delay <= 4'b0000;
 end
@@ -291,7 +291,7 @@ end
 always@(negedge ps2_clk_in)
 begin
   if (cur_state == trans)
-     byte_cnt <= byte_cnt+1;
+     byte_cnt <= byte_cnt+4'b1;
   else
      byte_cnt <= 4'b0000;
 end

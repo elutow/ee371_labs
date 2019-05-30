@@ -566,5 +566,4 @@ default: begin
     next_y = 'x;
     next_step = 'x;
     $error("Default of STATE_ERASE reached!");
-    $stop;
 end

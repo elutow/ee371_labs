@@ -35,7 +35,6 @@ default: begin
     next_y = 'x;
     next_step = 'x;
     $error("Default of STATE_DRAW reached!");
-    $stop;
 end"""
 
 _STATE_ERASE_FINAL = """{step}: begin
@@ -49,7 +48,6 @@ default: begin
     next_y = 'x;
     next_step = 'x;
     $error("Default of STATE_ERASE reached!");
-    $stop;
 end"""
 
 def _get_dim_expr(var_name, diff_val):

@@ -38,27 +38,27 @@ module freehand_tool
                     0: begin
                         next_x = pixel_x;
                         next_y = pixel_y;
-                        next_step = 'd1;
+                        next_step = 4'd1;
                     end
                     1: begin
-                        next_x = pixel_x + 'd1;
+                        next_x = pixel_x + $clog2(WIDTH)'(1);
                         next_y = pixel_y;
-                        next_step = 'd2;
+                        next_step = 4'd2;
                     end
                     2: begin
                         next_x = pixel_x;
-                        next_y = pixel_y + 'd1;
-                        next_step = 'd3;
+                        next_y = pixel_y + $clog2(HEIGHT)'(1);
+                        next_step = 4'd3;
                     end
                     3: begin
-                        next_x = pixel_x - 'd1;
+                        next_x = pixel_x - $clog2(WIDTH)'(1);
                         next_y = pixel_y;
-                        next_step = 'd4;
+                        next_step = 4'd4;
                     end
                     4: begin
                         next_x = pixel_x;
-                        next_y = pixel_y - 'd1;
-                        next_step = 'd5;
+                        next_y = pixel_y - $clog2(HEIGHT)'(1);
+                        next_step = 4'd5;
                     end
                     5: begin
                         next_x = pixel_x;
@@ -73,7 +73,6 @@ module freehand_tool
                         next_y = 'x;
                         next_step = 'x;
                         $error("Default of STATE_DRAW reached!");
-                        $stop;
                     end
                 endcase
             end

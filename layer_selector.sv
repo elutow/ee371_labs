@@ -15,7 +15,7 @@ module layer_selector
         if (toggle) begin
             if (!changed) begin
                 next_changed = 1;
-				next_layer = layer + 1;
+				next_layer = layer + 3'd1;
             end
         end
         else begin

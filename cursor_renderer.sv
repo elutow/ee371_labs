@@ -19,7 +19,8 @@ module cursor_renderer
     logic [$clog2(HEIGHT)-1:0] y, next_y;
     logic [COLOR_WIDTH-1:0] color, next_color;
     // Animation step
-    logic [$clog2(140):0] step, next_step;
+    localparam STEP_BITS = $clog2(140);
+    logic [STEP_BITS-1:0] step, next_step;
 
     enum {STATE_INIT, STATE_DRAW, STATE_ERASE} ps, ns;
 
@@ -35,7 +36,7 @@ module cursor_renderer
             STATE_DRAW: begin
                 ns = STATE_DRAW;
                 next_color = color;
-                next_step = step + 'd1;
+                next_step = step + STEP_BITS'('d1);
                 unique case (step)
                     `include "cursor_renderer_draw_steps.sv"
                 endcase
@@ -43,7 +44,7 @@ module cursor_renderer
             STATE_ERASE: begin
                 ns = STATE_ERASE;
                 next_color = COLOR_NONE;
-                next_step = step + 'd1;
+                next_step = step + STEP_BITS'('d1);
                 unique case (step)
                     `include "cursor_renderer_erase_steps.sv"
                 endcase
