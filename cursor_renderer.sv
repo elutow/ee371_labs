@@ -104,7 +104,7 @@ module cursor_renderer_testbench();
         end
         // Test erasing and drawing in new location
         cursor_x <= 5; cursor_y <= 5; @(posedge clk);
-        for (i=0; i<142; i++) begin
+        for (i=0; i<2*142; i++) begin
             @(posedge clk);
         end
         $stop;

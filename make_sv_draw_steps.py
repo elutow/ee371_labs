@@ -42,10 +42,7 @@ _STATE_ERASE_FINAL = """{step}: begin
     next_x = x;
     next_y = y;
     next_step = step;
-    if (x != cursor_x || y != cursor_y) begin
-        next_step = 0;
-        ns = STATE_ERASE;
-    end
+    ns = STATE_INIT;
 end
 default: begin
     next_x = 'x;
