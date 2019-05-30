@@ -8,7 +8,7 @@
 // KEY[3]: Run the autofocus system.
 // SW[9]: Choose between full and central auto-focus, plus yellow rectangle.
 
-module DE1_SOC_D8M_RTL(
+module terasic_camera(
 
 		//////////// ADC //////////
 		output		          		ADC_CONVST,
