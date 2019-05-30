@@ -137,42 +137,6 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[6]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[7]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[8]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[9]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[0]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[10]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[11]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[12]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[13]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[14]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[15]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[16]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[17]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[18]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[19]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[1]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[20]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[21]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[22]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[23]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[24]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[25]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[26]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[27]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[28]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[29]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[2]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[30]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[31]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[32]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[33]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[34]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[35]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[3]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[4]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[5]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[6]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[7]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[8]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1[9]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[1]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[2]
@@ -413,6 +377,55 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_R[6]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_R[7]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_SYNC_N
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to VGA_VS
+# BEGIN D8M-GPIO camera pins
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CAMERA_I2C_SCL
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CAMERA_I2C_SDA
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CAMERA_PWDN_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_CS_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_I2C_SCL
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_I2C_SDA
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_MCLK
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_CLK
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_D[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_D[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_D[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_D[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_D[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_D[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_D[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_D[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_D[8]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_D[9]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_HS
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_PIXEL_VS
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_REFCLK
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MIPI_RESET_n
+set_location_assignment PIN_AK22 -to CAMERA_I2C_SCL
+set_location_assignment PIN_AJ22 -to CAMERA_I2C_SDA
+set_location_assignment PIN_AH23 -to CAMERA_PWDN_n
+set_location_assignment PIN_AG23 -to MIPI_CS_n
+set_location_assignment PIN_AF24 -to MIPI_I2C_SCL
+set_location_assignment PIN_AF23 -to MIPI_I2C_SDA
+set_location_assignment PIN_AH22 -to MIPI_MCLK
+#pin 0 of GPIO1
+#set_location_assignment PIN_AB17 -to MIPI_PIXEL_CLK
+#pin 1 of GPIO1
+set_location_assignment PIN_AA21 -to MIPI_PIXEL_CLK
+set_location_assignment PIN_AC23 -to MIPI_PIXEL_D[0]
+set_location_assignment PIN_AD24 -to MIPI_PIXEL_D[1]
+set_location_assignment PIN_AE23 -to MIPI_PIXEL_D[2]
+set_location_assignment PIN_AE24 -to MIPI_PIXEL_D[3]
+set_location_assignment PIN_AF25 -to MIPI_PIXEL_D[4]
+set_location_assignment PIN_AF26 -to MIPI_PIXEL_D[5]
+set_location_assignment PIN_AG25 -to MIPI_PIXEL_D[6]
+set_location_assignment PIN_AG26 -to MIPI_PIXEL_D[7]
+set_location_assignment PIN_AH24 -to MIPI_PIXEL_D[8]
+set_location_assignment PIN_AH27 -to MIPI_PIXEL_D[9]
+set_location_assignment PIN_AK24 -to MIPI_PIXEL_HS
+set_location_assignment PIN_AJ25 -to MIPI_PIXEL_VS
+set_location_assignment PIN_AK26 -to MIPI_REFCLK
+set_location_assignment PIN_AK23 -to MIPI_RESET_n
+# END D8M-GPIO camera pins
 set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
 set_location_assignment PIN_AJ4 -to ADC_CONVST
 set_location_assignment PIN_AK4 -to ADC_DIN
@@ -506,42 +519,6 @@ set_location_assignment PIN_AK19 -to GPIO_0[6]
 set_location_assignment PIN_AJ19 -to GPIO_0[7]
 set_location_assignment PIN_AJ17 -to GPIO_0[8]
 set_location_assignment PIN_AJ16 -to GPIO_0[9]
-set_location_assignment PIN_AB17 -to GPIO_1[0]
-set_location_assignment PIN_AG26 -to GPIO_1[10]
-set_location_assignment PIN_AH24 -to GPIO_1[11]
-set_location_assignment PIN_AH27 -to GPIO_1[12]
-set_location_assignment PIN_AJ27 -to GPIO_1[13]
-set_location_assignment PIN_AK29 -to GPIO_1[14]
-set_location_assignment PIN_AK28 -to GPIO_1[15]
-set_location_assignment PIN_AK27 -to GPIO_1[16]
-set_location_assignment PIN_AJ26 -to GPIO_1[17]
-set_location_assignment PIN_AK26 -to GPIO_1[18]
-set_location_assignment PIN_AH25 -to GPIO_1[19]
-set_location_assignment PIN_AA21 -to GPIO_1[1]
-set_location_assignment PIN_AJ25 -to GPIO_1[20]
-set_location_assignment PIN_AJ24 -to GPIO_1[21]
-set_location_assignment PIN_AK24 -to GPIO_1[22]
-set_location_assignment PIN_AG23 -to GPIO_1[23]
-set_location_assignment PIN_AK23 -to GPIO_1[24]
-set_location_assignment PIN_AH23 -to GPIO_1[25]
-set_location_assignment PIN_AK22 -to GPIO_1[26]
-set_location_assignment PIN_AJ22 -to GPIO_1[27]
-set_location_assignment PIN_AH22 -to GPIO_1[28]
-set_location_assignment PIN_AG22 -to GPIO_1[29]
-set_location_assignment PIN_AB21 -to GPIO_1[2]
-set_location_assignment PIN_AF24 -to GPIO_1[30]
-set_location_assignment PIN_AF23 -to GPIO_1[31]
-set_location_assignment PIN_AE22 -to GPIO_1[32]
-set_location_assignment PIN_AD21 -to GPIO_1[33]
-set_location_assignment PIN_AA20 -to GPIO_1[34]
-set_location_assignment PIN_AC22 -to GPIO_1[35]
-set_location_assignment PIN_AC23 -to GPIO_1[3]
-set_location_assignment PIN_AD24 -to GPIO_1[4]
-set_location_assignment PIN_AE23 -to GPIO_1[5]
-set_location_assignment PIN_AE24 -to GPIO_1[6]
-set_location_assignment PIN_AF25 -to GPIO_1[7]
-set_location_assignment PIN_AF26 -to GPIO_1[8]
-set_location_assignment PIN_AG25 -to GPIO_1[9]
 set_location_assignment PIN_AE26 -to HEX0[0]
 set_location_assignment PIN_AE27 -to HEX0[1]
 set_location_assignment PIN_AE28 -to HEX0[2]
@@ -673,6 +650,7 @@ set_global_assignment -name STATE_MACHINE_PROCESSING "USER-ENCODED"
 set_global_assignment -name NUM_PARALLEL_PROCESSORS 2
 set_global_assignment -name QIP_FILE CLOCK25_PLL.qip
 set_global_assignment -name SIP_FILE CLOCK25_PLL.sip
+set_global_assignment -name SOURCE_FILE V_Sdram_Control/Sdram_Params.h
 set_global_assignment -name SYSTEMVERILOG_FILE DE1_SoC.sv
 set_global_assignment -name SYSTEMVERILOG_FILE color_index_to_rgb.sv
 set_global_assignment -name SYSTEMVERILOG_FILE color_selector.sv
@@ -683,7 +661,38 @@ set_global_assignment -name SYSTEMVERILOG_FILE drawing_canvas.sv
 set_global_assignment -name SYSTEMVERILOG_FILE freehand_tool.sv
 set_global_assignment -name SYSTEMVERILOG_FILE layer_selector.sv
 set_global_assignment -name SYSTEMVERILOG_FILE metastability_filter.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ps2.sv
 set_global_assignment -name SYSTEMVERILOG_FILE seg7.sv
 set_global_assignment -name SYSTEMVERILOG_FILE video_driver.sv
+set_global_assignment -name VERILOG_FILE V/CLOCK_DELAY.v
+set_global_assignment -name VERILOG_FILE V/I2C_READ_DATA.v
+set_global_assignment -name VERILOG_FILE V/I2C_RESET_DELAY.v
+set_global_assignment -name VERILOG_FILE V/I2C_WRITE_PTR.v
+set_global_assignment -name VERILOG_FILE V/I2C_WRITE_WDATA.v
+set_global_assignment -name VERILOG_FILE V/RESET_DELAY.v
+set_global_assignment -name VERILOG_FILE V/pll_test.v
+set_global_assignment -name VERILOG_FILE V/sdram_pll.v -library sdram_pll
+set_global_assignment -name VERILOG_FILE V_Auto/AUTO_FOCUS_ON.v
+set_global_assignment -name VERILOG_FILE V_Auto/AUTO_SYNC_MODIFY.v
+set_global_assignment -name VERILOG_FILE V_Auto/FOCUS_ADJ.v
+set_global_assignment -name VERILOG_FILE V_Auto/F_VCM.v
+set_global_assignment -name VERILOG_FILE V_Auto/I2C_DELAY.v
+set_global_assignment -name VERILOG_FILE V_Auto/LCD_COUNTER.v
+set_global_assignment -name VERILOG_FILE V_Auto/MODIFY_SYNC.v
+set_global_assignment -name VERILOG_FILE V_Auto/VCM_CTRL_P.v
+set_global_assignment -name VERILOG_FILE V_Auto/VCM_I2C.v
+set_global_assignment -name VERILOG_FILE V_D8M/Line_Buffer_J.v
+set_global_assignment -name VERILOG_FILE V_D8M/MIPI_BRIDGE_CAMERA_Config.v
+set_global_assignment -name VERILOG_FILE V_D8M/MIPI_BRIDGE_CONFIG.v
+set_global_assignment -name VERILOG_FILE V_D8M/MIPI_CAMERA_CONFIG.v
+set_global_assignment -name VERILOG_FILE V_D8M/RAW2RGB_J.v
+set_global_assignment -name VERILOG_FILE V_D8M/RAW_RGB_BIN.v
+set_global_assignment -name VERILOG_FILE V_D8M/VGA_RD_COUNTER.v
+set_global_assignment -name VERILOG_FILE V_D8M/int_line.v
+set_global_assignment -name VERILOG_FILE V_Sdram_Control/Sdram_Control.v
+set_global_assignment -name VERILOG_FILE V_Sdram_Control/Sdram_RD_FIFO.v
+set_global_assignment -name VERILOG_FILE V_Sdram_Control/Sdram_WR_FIFO.v
+set_global_assignment -name VERILOG_FILE V_Sdram_Control/command.v
+set_global_assignment -name VERILOG_FILE V_Sdram_Control/control_interface.v
+set_global_assignment -name VERILOG_FILE V_Sdram_Control/sdr_data_path.v
 set_global_assignment -name VERILOG_FILE altera_up_avalon_video_vga_timing.v
-set_global_assignment -name VERILOG_FILE ps2.v
