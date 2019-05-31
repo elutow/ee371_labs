@@ -27,6 +27,7 @@ module terasic_camera(
 		input logic VGA_HS,
 		input logic VGA_VS,
 		input logic VGA_CLK,
+		output logic DLY_RST_2,
 
 		//////////// GPIO_1, GPIO_1 connect to D8M-GPIO //////////
 		output logic CAMERA_I2C_SCL,
@@ -76,6 +77,9 @@ wire        LUT_MIPI_PIXEL_VS;
 wire [9:0]  LUT_MIPI_PIXEL_D  ;
 wire        MIPI_PIXEL_CLK_;
 wire [9:0]  PCK;
+
+logic MASTER_RESET;
+
 //=======================================================
 // Structural coding
 //=======================================================
@@ -111,7 +115,7 @@ RESET_DELAY			u2	(
                      .iCLK  ( CLOCK2_50 ),
 							.oRST_0( DLY_RST_0 ),
 							.oRST_1( DLY_RST_1 ),
-							.oRST_2( ),
+							.oRST_2( DLY_RST_2 ),
 						   .oREADY( RESET_N)
 
 						);
@@ -150,7 +154,6 @@ logic [22:0] WR1_ADDR = 0, WR1_MAX_ADDR = 640 * 480,
 				 RD1_ADDR = 0, RD1_MAX_ADDR = 640 * 480;
 
 // Picture taking logic
-logic MASTER_RESET;
 assign MASTER_RESET = (reset && ~take_picture);
 
 always_comb begin

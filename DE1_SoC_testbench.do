@@ -4,10 +4,7 @@ vlib work
 # Compile Verilog
 #     All Verilog files that are part of this design should have
 #     their own "vlog" line below.
-vlog "CLOCK25_PLL.v"
-vlog "CLOCK25_PLL/CLOCK25_PLL_0002.v"
 vlog "DE1_SoC.sv"
-vlog "altera_up_avalon_video_vga_timing.v"
 vlog "color_index_to_rgb.sv"
 vlog "color_selector.sv"
 vlog "common.sv"
@@ -20,7 +17,8 @@ vlog "metastability_filter.sv"
 vlog "ps2.sv"
 vlog "seg7.sv"
 vlog "terasic_camera.sv"
-vlog "video_driver.sv"
+vlog "VGA_Controller/VGA_Controller.v"
+vlog "V/VIDEO_PLL.v"
 vlog "V/CLOCKMEM.v"
 vlog "V/CLOCK_DELAY.v"
 vlog "V/I2C_READ_DATA.v"

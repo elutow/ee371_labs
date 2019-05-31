@@ -53,7 +53,7 @@ module DE1_SoC
     logic [COLOR_WIDTH-1:0] current_color;
     logic [2:0] current_layer;
     // VGA I/O
-    logic vga_read_enable;
+    logic vga_read_request;
     logic [7:0] vga_r, vga_g, vga_b;
     logic [$clog2(WIDTH)-1:0] request_x;
     logic [$clog2(HEIGHT)-1:0] request_y;
@@ -70,6 +70,7 @@ module DE1_SoC
     logic [COLOR_WIDTH-1:0] canvas1_color, canvas2_color, canvas3_color, canvas4_color;
     // Terasic camera I/O
     logic [7:0] camera_r, camera_g, camera_b;
+    logic vga_reset;
 
     // Filtered signals
     logic reset;
@@ -143,23 +144,45 @@ module DE1_SoC
         .CLOCK_50, .start(ps2_start), .reset, .PS2_CLK, .PS2_DAT,
         .button_left(cursor_left), .button_middle(), .button_right(cursor_right),
         .bin_x(cursor_x), .bin_y(raw_cursor_y));
-
     // For ensuring mouse enables
     assign LEDR[9] = cursor_left;
     assign LEDR[8] = cursor_right;
-
     // Invert y coordinates
     assign cursor_y = $clog2(HEIGHT)'(HEIGHT-1) - $clog2(HEIGHT)'(raw_cursor_y);
-    video_driver #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) vga_driver(
-        .CLOCK_50, .reset, .x(request_x), .y(request_y),
-        .r(vga_r), .g(vga_g), .b(vga_b), .read_enable(vga_read_enable),
-        .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
-        .VGA_BLANK_N, .VGA_SYNC_N);
+
+    // VGA driver modules
+    VIDEO_PLL vga_pll(
+        .inclk0(CLOCK2_50),
+        .areset(reset),
+        .c0(VGA_CLK));
+    VGA_Controller vga_control(
+        .oRequest(vga_read_request),
+        .iRed(vga_r),
+        .iGreen(vga_g),
+        .iBlue(vga_b),
+        .oVGA_R(VGA_R),
+        .oVGA_G(VGA_G),
+        .oVGA_B(VGA_B),
+        .oVGA_H_SYNC(VGA_HS),
+        .oVGA_V_SYNC(VGA_VS),
+        .oVGA_SYNC(VGA_SYNC_N),
+        .oVGA_BLANK(VGA_BLANK_N),
+        .iCLK(VGA_CLK),
+        .iRST_N(vga_reset),
+        .H_Cont(request_x),
+        .V_Cont(request_y));
+
+    //video_driver #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) vga_driver(
+    //    .CLOCK_50, .reset, .x(request_x), .y(request_y),
+    //    .r(vga_r), .g(vga_g), .b(vga_b), .read_enable_last(vga_read_request),
+    //    .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
+    //    .VGA_BLANK_N, .VGA_SYNC_N);
+
     terasic_camera gpio_camera(
-        .reset(SW[7]), .take_picture, .READ_Request(vga_read_enable),
+        .reset(SW[7]), .take_picture, .READ_Request(vga_read_request),
         .out_r(camera_r), .out_g(camera_g), .out_b(camera_b),
         .DRAM_ADDR, .DRAM_BA, .DRAM_CAS_N, .DRAM_CKE, .DRAM_CLK, .DRAM_CS_N, .DRAM_DQ,
-        .DRAM_RAS_N, .DRAM_WE_N, .CLOCK2_50, .CLOCK3_50, .CLOCK_50, .VGA_HS, .VGA_VS, .VGA_CLK,
+        .DRAM_RAS_N, .DRAM_WE_N, .CLOCK2_50, .CLOCK3_50, .CLOCK_50, .VGA_HS, .VGA_VS, .VGA_CLK, .DLY_RST_2(vga_reset),
         .CAMERA_I2C_SCL, .CAMERA_I2C_SDA, .CAMERA_PWDN_n, .MIPI_CS_n, .MIPI_I2C_SCL,
         .MIPI_I2C_SDA, .MIPI_MCLK, .MIPI_PIXEL_CLK, .MIPI_PIXEL_D, .MIPI_PIXEL_HS, .MIPI_PIXEL_VS,
         .MIPI_REFCLK, .MIPI_RESET_n);
