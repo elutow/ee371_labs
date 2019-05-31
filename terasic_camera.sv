@@ -107,7 +107,7 @@ assign CAMERA_I2C_SCL =( I2C_RELEASE  )?  CAMERA_I2C_SCL_AF  : CAMERA_I2C_SCL_MI
 
 //----- RESET RELAY  --
 RESET_DELAY			u2	(
-							.iRST  ( ~reset ),
+							.iRST  ( ~MASTER_RESET ),
                      .iCLK  ( CLOCK2_50 ),
 							.oRST_0( DLY_RST_0 ),
 							.oRST_1( DLY_RST_1 ),
@@ -131,7 +131,7 @@ MIPI_BRIDGE_CAMERA_Config    cfin(
 //------MIPI / VGA REF CLOCK  --
 pll_test pll_ref(
 	                   .inclk0 ( CLOCK3_50 ),
-	                   .areset ( reset ),
+	                   .areset ( MASTER_RESET ),
 	                   .c0( MIPI_REFCLK    ) //20Mhz
 
     );
@@ -147,36 +147,31 @@ sdram_pll u6(
 
 // Picture taking logic
 logic [22:0] WR1_ADDR = 0, WR1_MAX_ADDR = 0, RD1_ADDR = 0, RD1_MAX_ADDR = 0;
-logic [22:0] counter;
 
-always_ff @(posedge MIPI_PIXEL_CLK_) begin
+logic MASTER_RESET, picture_reset;
+assign MASTER_RESET = reset || picture_reset;
+
+always_comb begin
 	if (take_picture) begin
-		WR1_ADDR     <= 2 * 640 * 480;
-		WR1_MAX_ADDR <= 3 * 640 * 480;
-	end
-	else if (counter == 640 * 480) begin
-		RD1_ADDR     <= 0 * 640 * 480;
-		RD1_MAX_ADDR <= 1 * 640 * 480;
-		WR1_ADDR     <= 0 * 640 * 480;
-		WR1_MAX_ADDR <= 1 * 640 * 480;
-	end
-
-	if (reset) begin
-		counter <= 0;
-		WR1_ADDR     <= 0 * 640 * 480;
-		WR1_MAX_ADDR <= 1 * 640 * 480;
-		RD1_ADDR     <= 0 * 640 * 480;
-		RD1_MAX_ADDR <= 1 * 640 * 480;
+		WR1_ADDR     = 2 * 640 * 480;
+		WR1_MAX_ADDR = 3 * 640 * 480;
 	end
 	else begin
-		if (counter == (640 * 480)) counter <= 0;
-		else counter <= counter + 1;
+		WR1_ADDR     = 0 * 640 * 480;
+		WR1_MAX_ADDR = 1 * 640 * 480;
 	end
+end
+
+always_ff @(posedge MIPI_PIXEL_CLK_) begin
+	if ((!take_picture) && (WR1_ADDR == 2 * 640 * 480)) picture_reset <= 1;
+	else picture_reset <= 0;
+
+	if (MASTER_RESET) picture_reset <= 0;
 end
 
 //------SDRAM CONTROLLER --
 Sdram_Control	   u7	(	//	HOST Side
-								 .RESET_N     ( reset ),
+								 .RESET_N     ( ~MASTER_RESET ),
 								 .CLK         ( SDRAM_CTRL_CLK ) ,
 								 //	FIFO Write Side 1
 								 .WR1_DATA    ( LUT_MIPI_PIXEL_D[9:0] ),
