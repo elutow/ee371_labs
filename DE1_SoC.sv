@@ -14,40 +14,40 @@ module DE1_SoC
     input logic [3:0] KEY;
     input logic [9:0] SW;
 
-    input CLOCK_50, CLOCK2_50, CLOCK3_50;
+    input logic CLOCK_50, CLOCK2_50, CLOCK3_50;
     inout PS2_CLK, PS2_DAT;
-    output [7:0] VGA_R;
-    output [7:0] VGA_G;
-    output [7:0] VGA_B;
-    output VGA_BLANK_N;
-    output VGA_CLK;
-    output VGA_HS;
-    output VGA_SYNC_N;
-    output VGA_VS;
+    output logic [7:0] VGA_R;
+    output logic [7:0] VGA_G;
+    output logic [7:0] VGA_B;
+    output logic VGA_BLANK_N;
+    output logic VGA_CLK;
+    output logic VGA_HS;
+    output logic VGA_SYNC_N;
+    output logic VGA_VS;
 
     inout [15:0] DRAM_DQ;
-    output [12:0] DRAM_ADDR;
-    output [1:0] DRAM_BA;
-    output DRAM_CAS_N;
-    output DRAM_CKE;
-    output DRAM_CLK;
-    output DRAM_CS_N;
-    output DRAM_RAS_N;
-    output DRAM_WE_N;
+    output logic [12:0] DRAM_ADDR;
+    output logic [1:0] DRAM_BA;
+    output logic DRAM_CAS_N;
+    output logic DRAM_CKE;
+    output logic DRAM_CLK;
+    output logic DRAM_CS_N;
+    output logic DRAM_RAS_N;
+    output logic DRAM_WE_N;
 
     inout CAMERA_I2C_SDA;
     inout MIPI_I2C_SCL;
     inout MIPI_I2C_SDA;
-    input MIPI_PIXEL_CLK;
-    input MIPI_PIXEL_HS;
-    input MIPI_PIXEL_VS;
-    input [9:0] MIPI_PIXEL_D;
-    output CAMERA_I2C_SCL;
-    output CAMERA_PWDN_n;
-    output MIPI_CS_n;
-    output MIPI_MCLK;
-    output MIPI_REFCLK;
-    output MIPI_RESET_n;
+    input logic MIPI_PIXEL_CLK;
+    input logic MIPI_PIXEL_HS;
+    input logic MIPI_PIXEL_VS;
+    input logic [9:0] MIPI_PIXEL_D;
+    output logic CAMERA_I2C_SCL;
+    output logic CAMERA_PWDN_n;
+    output logic MIPI_CS_n;
+    output logic MIPI_MCLK;
+    output logic MIPI_REFCLK;
+    output logic MIPI_RESET_n;
 
     // Inter-module signals
     logic [COLOR_WIDTH-1:0] current_color;

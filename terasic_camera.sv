@@ -8,40 +8,40 @@ module terasic_camera(
 		output logic [7:0] out_r, out_g, out_b,
 
 		//////////// CLOCK //////////
-		input 		          		CLOCK2_50,
-		input 		          		CLOCK3_50,
-		input 		          		CLOCK_50,
+		input logic CLOCK2_50,
+		input logic CLOCK3_50,
+		input logic CLOCK_50,
 
 		//////////// SDRAM //////////
-		output		    [12:0]		DRAM_ADDR,
-		output		    [1:0]		  DRAM_BA,
-		output		          		DRAM_CAS_N,
-		output		          		DRAM_CKE,
-		output		          		DRAM_CLK,
-		output		          		DRAM_CS_N,
-		inout 		    [15:0]		DRAM_DQ,
-		output		          		DRAM_RAS_N,
-		output		          		DRAM_WE_N,
+		output logic [12:0]		DRAM_ADDR,
+		output logic [1:0]		  DRAM_BA,
+		output logic DRAM_CAS_N,
+		output logic DRAM_CKE,
+		output logic DRAM_CLK,
+		output logic DRAM_CS_N,
+		inout [15:0]		DRAM_DQ,
+		output logic DRAM_RAS_N,
+		output logic DRAM_WE_N,
 
 		//////////// VGA //////////
-		input VGA_HS,
-		input VGA_VS,
-		input VGA_CLK,
+		input logic VGA_HS,
+		input logic VGA_VS,
+		input logic VGA_CLK,
 
 		//////////// GPIO_1, GPIO_1 connect to D8M-GPIO //////////
-		output 		          		CAMERA_I2C_SCL,
-		inout 		          		CAMERA_I2C_SDA,
-		output		          		CAMERA_PWDN_n,
-		output		          		MIPI_CS_n,
-		inout 		          		MIPI_I2C_SCL,
-		inout 		          		MIPI_I2C_SDA,
-		output		          		MIPI_MCLK,
-		input 		          		MIPI_PIXEL_CLK,
-		input 		     [9:0]		MIPI_PIXEL_D,
-		input 		          		MIPI_PIXEL_HS,
-		input 		          		MIPI_PIXEL_VS,
-		output		          		MIPI_REFCLK,
-		output		          		MIPI_RESET_n
+		output logic CAMERA_I2C_SCL,
+		inout CAMERA_I2C_SDA,
+		output logic CAMERA_PWDN_n,
+		output logic MIPI_CS_n,
+		inout MIPI_I2C_SCL,
+		inout MIPI_I2C_SDA,
+		output logic MIPI_MCLK,
+		input logic MIPI_PIXEL_CLK,
+		input logic [9:0]		MIPI_PIXEL_D,
+		input logic MIPI_PIXEL_HS,
+		input logic MIPI_PIXEL_VS,
+		output logic MIPI_REFCLK,
+		output logic MIPI_RESET_n
 );
 
 //=============================================================================
