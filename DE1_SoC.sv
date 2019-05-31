@@ -77,10 +77,20 @@ module DE1_SoC
     logic cursor_visible;
     logic layer_toggle;
     logic take_picture;
+    logic ps2_start;
+
+    // Turn off unwanted hex displays
+    assign HEX1 = 7'hFF;
+    assign HEX2 = 7'hFF;
+    assign HEX3 = 7'hFF;
+    assign HEX4 = 7'hFF;
+    assign HEX5 = 7'hFF;
 
     // Metastability filters
     metastability_filter reset_filter(
         .clk(CLOCK_50), .reset(1'b0), .direct_in(~KEY[3]), .filtered_out(reset));
+    metastability_filter ps2_start_filter(
+        .clk(CLOCK_50), .reset, .direct_in(~KEY[2]), .filtered_out(ps2_start));
     metastability_filter layer_toggle_filter(
         .clk(CLOCK_50), .reset, .direct_in(~KEY[0]), .filtered_out(layer_toggle));
     metastability_filter cursor_visible_filter(
@@ -130,9 +140,14 @@ module DE1_SoC
 
     // Peripheral attachments
     ps2 #(.WIDTH(WIDTH), .HEIGHT(HEIGHT), .HYSTERESIS(2), .BIN(5)) ps2_mouse(
-        .CLOCK_50, .start(reset), .reset, .PS2_CLK, .PS2_DAT,
+        .CLOCK_50, .start(ps2_start), .reset, .PS2_CLK, .PS2_DAT,
         .button_left(cursor_left), .button_middle(), .button_right(cursor_right),
         .bin_x(cursor_x), .bin_y(raw_cursor_y));
+
+    // For ensuring mouse enables
+    assign LEDR[9] = cursor_left;
+    assign LEDR[8] = cursor_right;
+
     // Invert y coordinates
     assign cursor_y = $clog2(HEIGHT)'(HEIGHT-1) - $clog2(HEIGHT)'(raw_cursor_y);
     video_driver #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) vga_driver(
