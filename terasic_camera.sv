@@ -146,27 +146,26 @@ sdram_pll u6(
 	               );
 
 // Picture taking logic
-logic [22:0] WR1_ADDR = 0, WR1_MAX_ADDR = 0, RD1_ADDR = 0, RD1_MAX_ADDR = 0;
+logic [22:0] WR1_ADDR = 0, WR1_MAX_ADDR = 640 * 480,
+				 RD1_ADDR = 0, RD1_MAX_ADDR = 640 * 480;
 
-logic MASTER_RESET, picture_reset;
-assign MASTER_RESET = reset || picture_reset;
+// Picture taking logic
+logic MASTER_RESET;
+assign MASTER_RESET = (reset && ~take_picture);
 
 always_comb begin
-	if (take_picture) begin
-		WR1_ADDR     = 2 * 640 * 480;
-		WR1_MAX_ADDR = 3 * 640 * 480;
-	end
-	else begin
+	if (~take_picture) begin
+		RD1_ADDR     = 0 * 640 * 480;
+		RD1_MAX_ADDR = 1 * 640 * 480;
 		WR1_ADDR     = 0 * 640 * 480;
 		WR1_MAX_ADDR = 1 * 640 * 480;
 	end
-end
-
-always_ff @(posedge MIPI_PIXEL_CLK_) begin
-	if ((!take_picture) && (WR1_ADDR == 2 * 640 * 480)) picture_reset <= 1;
-	else picture_reset <= 0;
-
-	if (MASTER_RESET) picture_reset <= 0;
+	else begin
+		RD1_ADDR     = 0 * 640 * 480;
+		RD1_MAX_ADDR = 1 * 640 * 480;
+		WR1_ADDR     = 2 * 640 * 480;
+		WR1_MAX_ADDR = 3 * 640 * 480;
+	end
 end
 
 //------SDRAM CONTROLLER --

@@ -100,7 +100,7 @@ module DE1_SoC
     metastability_filter frame2_visible_filter(
         .clk(CLOCK_50), .reset, .direct_in(SW[2]), .filtered_out(canvas2_visible));
     metastability_filter take_picture_filter(
-        .clk(CLOCK_50), .reset, .direct_in(SW[9]), .filtered_out(take_picture));
+        .clk(CLOCK_50), .reset, .direct_in(SW[8]), .filtered_out(take_picture));
 
     // Cursor logic attachments
     color_selector select_color(
@@ -156,7 +156,7 @@ module DE1_SoC
         .VGA_R, .VGA_G, .VGA_B, .VGA_CLK, .VGA_HS, .VGA_VS,
         .VGA_BLANK_N, .VGA_SYNC_N);
     terasic_camera gpio_camera(
-        .reset, .take_picture, .READ_Request(vga_read_enable),
+        .reset(SW[7]), .take_picture, .READ_Request(vga_read_enable),
         .out_r(camera_r), .out_g(camera_g), .out_b(camera_b),
         .DRAM_ADDR, .DRAM_BA, .DRAM_CAS_N, .DRAM_CKE, .DRAM_CLK, .DRAM_CS_N, .DRAM_DQ,
         .DRAM_RAS_N, .DRAM_WE_N, .CLOCK2_50, .CLOCK3_50, .CLOCK_50, .VGA_HS, .VGA_VS, .VGA_CLK,
