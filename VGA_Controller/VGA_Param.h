@@ -1,3 +1,6 @@
+`ifndef _VGA_PARAM_H
+`define _VGA_PARAM_H
+`define _VGA_PARAM_H
 //	Horizontal Parameter	( Pixel )
 parameter	H_SYNC_CYC	=	96;
 parameter	H_SYNC_BACK	=	48;
@@ -19,3 +22,4 @@ parameter	X_START		=	H_SYNC_CYC+H_SYNC_BACK;
 parameter	Y_START		=	V_SYNC_CYC+V_SYNC_BACK;
 parameter	H_BLANK	   =	H_SYNC_FRONT+H_SYNC_CYC+H_SYNC_BACK;
 parameter	V_BLANK	   =	V_SYNC_FRONT+V_SYNC_CYC+V_SYNC_BACK;
+`endif // _VGA_PARAM_H

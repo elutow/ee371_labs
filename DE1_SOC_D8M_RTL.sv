@@ -8,6 +8,9 @@
 // KEY[3]: Run the autofocus system.
 // SW[9]: Choose between full and central auto-focus, plus yellow rectangle.
 
+`include "VGA_Controller/VGA_Param.h"
+`include "common.sv"
+
 module DE1_SOC_D8M_RTL(
 	//////////// CLOCK //////////
 	input 		          		CLOCK2_50,
@@ -26,6 +29,10 @@ module DE1_SOC_D8M_RTL(
 	output		          		DRAM_RAS_N,
 	output		          		DRAM_UDQM,
 	output		          		DRAM_WE_N,
+
+	output logic [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5,
+	output logic [9:0] LEDR,
+	inout PS2_CLK, PS2_DAT,
 
 	//////////// KEY //////////
 	input 		     [3:0]		KEY,
@@ -72,10 +79,7 @@ module DE1_SOC_D8M_RTL(
 	wire		          		pre_VGA_VS;
 
 	assign VGA_BLANK_N = pre_VGA_BLANK_N;
-	assign VGA_B = pre_VGA_B;
-	assign VGA_G = pre_VGA_G;
 	assign VGA_HS = pre_VGA_HS;
-	assign VGA_R = pre_VGA_R;
 	assign VGA_SYNC_N = pre_VGA_SYNC_N;
 	assign VGA_VS = pre_VGA_VS;
 
@@ -228,9 +232,6 @@ Sdram_Control	   u7	(	//	HOST Side
 								 .DQM         ( DRAM_DQM  )
 );
 
-logic reset;
-assign reset = ~KEY[2];
-
 logic [22:0] WR1_ADDR = 0, WR1_MAX_ADDR = 640 * 480,
 				 RD1_ADDR = 0, RD1_MAX_ADDR = 640 * 480;
 
@@ -240,8 +241,6 @@ assign WR1_MAX_ADDR = SW[8] ? (2*640*480) : (640*480);
 assign RD1_ADDR     = 0;
 assign RD1_MAX_ADDR = 640 * 480;
 */
-logic take_picture;
-assign take_picture = SW[8];
 
 // Picture taking logic
 
@@ -380,4 +379,117 @@ CLOCKMEM  ck3 ( .CLK(MIPI_PIXEL_CLK_)   ,.CLK_FREQ  (25000000  ) , . CK_1HZ (D8M
 
 //assign LEDR = { D8M_CK_HZ ,D8M_CK_HZ2,D8M_CK_HZ3 ,5'h0,CAMERA_MIPI_RELAESE ,MIPI_BRIDGE_RELEASE  } ;
 
+localparam WIDTH=640;
+localparam HEIGHT=480;
+
+// Inter-module signals
+logic [COLOR_WIDTH-1:0] current_color;
+logic [2:0] current_layer;
+// VGA I/O
+logic vga_read_request;
+logic [7:0] vga_r, vga_g, vga_b;
+logic [$clog2(WIDTH)-1:0] request_x;
+logic [$clog2(HEIGHT)-1:0] request_y;
+// Cursor renderer I/O
+logic cursor_left, cursor_right;
+logic [$clog2(WIDTH)-1:0] cursor_x;
+logic [$clog2(HEIGHT)-1:0] raw_cursor_y, cursor_y;
+logic [COLOR_WIDTH-1:0] cursor_color;
+// Freehand tool I/O
+logic [$clog2(WIDTH)-1:0] tool_x;
+logic [$clog2(HEIGHT)-1:0] tool_y;
+logic [COLOR_WIDTH-1:0] tool_color;
+// Drawing canvas I/O
+logic [COLOR_WIDTH-1:0] canvas1_color, canvas2_color, canvas3_color, canvas4_color;
+// Terasic camera I/O
+
+// Filtered signals
+logic reset;
+logic canvas1_visible, canvas2_visible, canvas3_visible, canvas4_visible;
+logic cursor_visible;
+logic layer_toggle;
+logic take_picture;
+logic ps2_start;
+
+// NOTE: Using these subtractions will violate timing violations too far so
+// that VGA will no longer work.
+//assign request_x = $clog2(WIDTH)'(VGA_H_CNT - X_START);
+//assign request_y = $clog2(HEIGHT)'(VGA_V_CNT - Y_START);
+assign request_x = $clog2(WIDTH)'(VGA_H_CNT);
+assign request_y = $clog2(HEIGHT)'(VGA_V_CNT);
+
+// Turn off unwanted hex displays
+assign HEX1 = 7'hFF;
+assign HEX2 = 7'hFF;
+assign HEX3 = 7'hFF;
+assign HEX4 = 7'hFF;
+assign HEX5 = 7'hFF;
+
+// Metastability filters
+metastability_filter reset_filter(
+	.clk(CLOCK_50), .reset(1'b0), .direct_in(~KEY[3]), .filtered_out(reset));
+metastability_filter ps2_start_filter(
+	.clk(CLOCK_50), .reset, .direct_in(~KEY[2]), .filtered_out(ps2_start));
+metastability_filter layer_toggle_filter(
+	.clk(CLOCK_50), .reset, .direct_in(~KEY[0]), .filtered_out(layer_toggle));
+metastability_filter cursor_visible_filter(
+	.clk(CLOCK_50), .reset, .direct_in(SW[0]), .filtered_out(cursor_visible));
+metastability_filter frame1_visible_filter(
+	.clk(CLOCK_50), .reset, .direct_in(SW[1]), .filtered_out(canvas1_visible));
+metastability_filter frame2_visible_filter(
+	.clk(CLOCK_50), .reset, .direct_in(SW[2]), .filtered_out(canvas2_visible));
+//metastability_filter take_picture_filter(
+//	.clk(CLOCK_50), .reset, .direct_in(SW[8]), .filtered_out(take_picture));
+assign take_picture = SW[8];
+
+// Cursor logic attachments
+color_selector select_color(
+	.clk(CLOCK_50), .reset, .toggle(cursor_right), .color(current_color));
+layer_selector select_layer(
+	.clk(CLOCK_50), .reset, .toggle(layer_toggle), .layer(current_layer));
+freehand_tool #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) tool_freehand(
+	.clk(CLOCK_50), .reset, .enable(cursor_left), .cursor_x, .cursor_y, .input_color(current_color),
+	.pixel_x(tool_x), .pixel_y(tool_y), .pixel_color(tool_color));
+cursor_renderer #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) cursor_drawer(
+	.clk(CLOCK_50), .reset, .cursor_x, .cursor_y, .current_color,
+	.request_x, .request_y, .render_color(cursor_color));
+
+// Drawing canvases
+drawing_canvas #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) canvas1(
+	.clk(CLOCK_50), .enable(current_layer == 1 && canvas1_visible),
+	.tool_x, .tool_y, .tool_color,
+	.pixel_x(request_x), .pixel_y(request_y), .pixel_color(canvas1_color));
+drawing_canvas #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) canvas2(
+	.clk(CLOCK_50), .enable(current_layer == 2 && canvas2_visible),
+	.tool_x, .tool_y, .tool_color,
+	.pixel_x(request_x), .pixel_y(request_y), .pixel_color(canvas2_color));
+assign canvas3_color = COLOR_NONE;
+assign canvas3_visible = 0;
+assign canvas4_color = COLOR_NONE;
+assign canvas4_visible = 0;
+
+// Drawing I/O to VGA I/O
+compositor #(.WIDTH(WIDTH), .HEIGHT(HEIGHT)) composer(
+	.camera_r(pre_VGA_R), .camera_g(pre_VGA_G), .camera_b(pre_VGA_B),
+	.cursor_color, .cursor_visible,
+	.canvas1_color, .canvas1_visible,
+	.canvas2_color, .canvas2_visible,
+	.canvas3_color, .canvas3_visible,
+	.canvas4_color, .canvas4_visible,
+	.render_r(VGA_R), .render_g(VGA_G), .render_b(VGA_B));
+
+// Peripheral attachments
+ps2 #(.WIDTH(WIDTH), .HEIGHT(HEIGHT), .HYSTERESIS(2), .BIN(5)) ps2_mouse(
+	.CLOCK_50, .start(ps2_start), .reset, .PS2_CLK, .PS2_DAT,
+	.button_left(cursor_left), .button_middle(), .button_right(cursor_right),
+	.bin_x(cursor_x), .bin_y(raw_cursor_y));
+// For ensuring mouse enables
+assign LEDR[9] = cursor_left;
+assign LEDR[8] = cursor_right;
+// Invert y coordinates
+assign cursor_y = $clog2(HEIGHT)'(HEIGHT-1) - $clog2(HEIGHT)'(raw_cursor_y);
+
+// Misc board I/O attachments
+seg7 layer_display(
+	.hex({1'b0, current_layer}), .out(HEX0));
 endmodule

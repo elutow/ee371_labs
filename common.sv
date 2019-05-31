@@ -4,7 +4,7 @@
 `define _COMMON_SV
 
 // Total number of colors
-`define TOTAL_COLORS 5
+`define TOTAL_COLORS 6
 // Number of bits necessary to represent all colors
 localparam COLOR_WIDTH = $clog2(`TOTAL_COLORS);
 // Add colors in descending order
