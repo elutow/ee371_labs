@@ -17,7 +17,7 @@ module cursor_renderer
 
     logic [$clog2(WIDTH)-1:0] x, next_x;
     logic [$clog2(HEIGHT)-1:0] y, next_y;
-    logic [COLOR_WIDTH-1:0] color, next_color;
+    logic [COLOR_WIDTH-1:0] draw_color, next_draw_color, input_color, next_input_color;
     // Animation step
     localparam STEP_BITS = $clog2(140);
     logic [STEP_BITS-1:0] step, next_step;
@@ -25,17 +25,19 @@ module cursor_renderer
     enum {STATE_INIT, STATE_DRAW, STATE_ERASE} ps, ns;
 
     always_comb begin
+        next_input_color = input_color;
         unique case (ps)
             STATE_INIT: begin
                 ns = STATE_DRAW;
                 next_x = cursor_x;
                 next_y = cursor_y;
-                next_color = current_color;
+                next_draw_color = current_color;
+                next_input_color = current_color;
                 next_step = 0;
             end
             STATE_DRAW: begin
                 ns = STATE_DRAW;
-                next_color = color;
+                next_draw_color = draw_color;
                 next_step = step + STEP_BITS'('d1);
                 unique case (step)
                     `include "cursor_renderer_draw_steps.sv"
@@ -43,7 +45,7 @@ module cursor_renderer
             end
             STATE_ERASE: begin
                 ns = STATE_ERASE;
-                next_color = COLOR_NONE;
+                next_draw_color = COLOR_NONE;
                 next_step = step + STEP_BITS'('d1);
                 unique case (step)
                     `include "cursor_renderer_erase_steps.sv"
@@ -57,17 +59,19 @@ module cursor_renderer
             ps <= STATE_INIT;
             x <= cursor_x;
             y <= cursor_y;
-            color <= COLOR_NONE;
+            draw_color <= COLOR_NONE;
+            input_color <= COLOR_NONE;
             step <= 0;
         end
         else begin
             ps <= ns;
             x <= next_x;
             y <= next_y;
-            color <= next_color;
+            draw_color <= next_draw_color;
+            input_color <= next_input_color;
             step <= next_step;
         end
-        cursor_frame[x][y] <= color;
+        cursor_frame[x][y] <= draw_color;
         render_color <= cursor_frame[request_x][request_y];
     end
 endmodule

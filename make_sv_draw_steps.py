@@ -18,14 +18,14 @@ end"""
 _STEP_COLOR = """{step}: begin
     next_x = $clog2(WIDTH)'({x});
     next_y = $clog2(HEIGHT)'({y});
-    next_color = {color};
+    next_draw_color = {color};
 end"""
 
 _STATE_DRAW_FINAL = """{step}: begin
     next_x = x;
     next_y = y;
     next_step = step;
-    if (x != cursor_x || y != cursor_y) begin
+    if (x != cursor_x || y != cursor_y || input_color != current_color) begin
         next_step = 0;
         ns = STATE_ERASE;
     end

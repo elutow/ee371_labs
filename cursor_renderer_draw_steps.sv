@@ -359,263 +359,263 @@ end
 89: begin
     next_x = $clog2(WIDTH)'(x - 'd8);
     next_y = $clog2(HEIGHT)'(y - 'd18);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 90: begin
     next_x = $clog2(WIDTH)'(x);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 91: begin
     next_x = $clog2(WIDTH)'(x + 'd1);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 92: begin
     next_x = $clog2(WIDTH)'(x - 'd1);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 93: begin
     next_x = $clog2(WIDTH)'(x + 'd2);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 94: begin
     next_x = $clog2(WIDTH)'(x - 'd2);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 95: begin
     next_x = $clog2(WIDTH)'(x);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 96: begin
     next_x = $clog2(WIDTH)'(x + 'd4);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 97: begin
     next_x = $clog2(WIDTH)'(x - 'd4);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 98: begin
     next_x = $clog2(WIDTH)'(x + 'd5);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 99: begin
     next_x = $clog2(WIDTH)'(x - 'd5);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 100: begin
     next_x = $clog2(WIDTH)'(x + 'd6);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 101: begin
     next_x = $clog2(WIDTH)'(x - 'd6);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 102: begin
     next_x = $clog2(WIDTH)'(x + 'd7);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 103: begin
     next_x = $clog2(WIDTH)'(x - 'd7);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 104: begin
     next_x = $clog2(WIDTH)'(x + 'd8);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 105: begin
     next_x = $clog2(WIDTH)'(x - 'd8);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 106: begin
     next_x = $clog2(WIDTH)'(x + 'd9);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 107: begin
     next_x = $clog2(WIDTH)'(x - 'd9);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 108: begin
     next_x = $clog2(WIDTH)'(x + 'd10);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 109: begin
     next_x = $clog2(WIDTH)'(x - 'd10);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 110: begin
     next_x = $clog2(WIDTH)'(x + 'd11);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 111: begin
     next_x = $clog2(WIDTH)'(x - 'd11);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 112: begin
     next_x = $clog2(WIDTH)'(x + 'd12);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 113: begin
     next_x = $clog2(WIDTH)'(x - 'd12);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 114: begin
     next_x = $clog2(WIDTH)'(x + 'd7);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 115: begin
     next_x = $clog2(WIDTH)'(x + 'd1);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 116: begin
     next_x = $clog2(WIDTH)'(x + 'd1);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 117: begin
     next_x = $clog2(WIDTH)'(x + 'd1);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 118: begin
     next_x = $clog2(WIDTH)'(x + 'd1);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 119: begin
     next_x = $clog2(WIDTH)'(x + 'd1);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 120: begin
     next_x = $clog2(WIDTH)'(x - 'd12);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 121: begin
     next_x = $clog2(WIDTH)'(x + 'd4);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 122: begin
     next_x = $clog2(WIDTH)'(x + 'd3);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 123: begin
     next_x = $clog2(WIDTH)'(x - 'd7);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 124: begin
     next_x = $clog2(WIDTH)'(x + 'd3);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 125: begin
     next_x = $clog2(WIDTH)'(x + 'd2);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 126: begin
     next_x = $clog2(WIDTH)'(x + 'd3);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 127: begin
     next_x = $clog2(WIDTH)'(x - 'd8);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 128: begin
     next_x = $clog2(WIDTH)'(x + 'd2);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 129: begin
     next_x = $clog2(WIDTH)'(x + 'd3);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 130: begin
     next_x = $clog2(WIDTH)'(x + 'd3);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 131: begin
     next_x = $clog2(WIDTH)'(x - 'd8);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 132: begin
     next_x = $clog2(WIDTH)'(x + 'd1);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 133: begin
     next_x = $clog2(WIDTH)'(x + 'd5);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 134: begin
     next_x = $clog2(WIDTH)'(x + 'd3);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 135: begin
     next_x = $clog2(WIDTH)'(x - 'd3);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 136: begin
     next_x = $clog2(WIDTH)'(x + 'd3);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 137: begin
     next_x = $clog2(WIDTH)'(x - 'd2);
     next_y = $clog2(HEIGHT)'(y + 'd1);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 138: begin
     next_x = $clog2(WIDTH)'(x + 'd1);
     next_y = $clog2(HEIGHT)'(y);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 139: begin
     next_x = $clog2(WIDTH)'(x - 'd8);
     next_y = $clog2(HEIGHT)'(y - 'd19);
-    next_color = COLOR_BLACK;
+    next_draw_color = COLOR_BLACK;
 end
 140: begin
     next_x = x;
     next_y = y;
     next_step = step;
-    if (x != cursor_x || y != cursor_y) begin
+    if (x != cursor_x || y != cursor_y || input_color != current_color) begin
         next_step = 0;
         ns = STATE_ERASE;
     end
